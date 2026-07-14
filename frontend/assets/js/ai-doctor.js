@@ -178,7 +178,7 @@ async function getGeminiResponseWithFallback(userMessage) {
         return response;
     } catch (error) {
         console.log('Gemini API failed:', error.message);
-        return getServiceUnavailableMessage();
+        throw error; // Throw error to trigger smart fallback in sendMessage
     }
 }
 
