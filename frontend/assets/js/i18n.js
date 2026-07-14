@@ -727,12 +727,14 @@ window.createLanguageSwitcher = function() {
         </select>
     `;
 
-    // Insert switcher before logout button or first child
-    const logoutBtn = document.getElementById('logout-button');
-    if (logoutBtn) {
-        navbar.insertBefore(container, logoutBtn);
+    // Insert switcher before the How It Works link container (nav links)
+    const navLinksContainer = document.querySelector('.hidden.md\\:flex');
+    if (navLinksContainer) {
+        container.classList.remove('ml-4');
+        container.classList.add('mr-4');
+        navLinksContainer.parentNode.insertBefore(container, navLinksContainer);
     } else {
-        navbar.insertBefore(container, navbar.firstChild);
+        navbar.appendChild(container);
     }
 };
 
