@@ -1,124 +1,91 @@
 <!DOCTYPE html>
+
 <html class="scroll-smooth" lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Login | FractureOrSprain?</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="../assets/css/styles.css"/>
-    <script src="../assets/js/tailwind-config.js"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | FractureOrSprain?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&amp;family=Sora:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="../assets/css/styles.css" rel="stylesheet"/>
+<script src="../assets/js/tailwind-config.js"></script>
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased overflow-x-hidden">
-    <!-- Login Section -->
-    <section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-surface-bright to-surface-container-low px-margin-mobile md:px-margin-desktop">
-        <div class="w-full max-w-md">
-            <!-- Logo/Brand -->
-            <div class="text-center mb-stack-lg">
-                <a href="../index.html" class="inline-flex items-center gap-2 font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed mb-2">
-                    <span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">medical_services</span>
-                </a>
-                <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Welcome Back</h1>
-                <p class="font-body-md text-body-md text-on-surface-variant">
+<!-- Login Section -->
+<section class="min-h-screen flex items-center justify-center bg-gradient-to-br from-surface-bright to-surface-container-low px-margin-mobile md:px-margin-desktop">
+<div class="w-full max-w-md">
+<!-- Logo/Brand -->
+<div class="text-center mb-stack-lg">
+<a class="inline-flex items-center gap-2 font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed mb-2" data-i18n="login-a-7" href="../index.html">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</a>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2" data-i18n="login-h1-1">Welcome Back</h1>
+<p class="font-body-md text-body-md text-on-surface-variant" data-i18n="login-p-2">
                     Sign in to access your health assessments
                 </p>
-            </div>
-
-            <!-- Login Card -->
-            <div class="bg-surface-container-lowest rounded-2xl shadow-ambient border border-outline-variant/30 p-8">
-                <form id="login-form" class="space-y-6">
-                    <!-- Username/Email Field -->
-                    <div>
-                        <label for="username" class="block font-label-md text-label-md text-on-surface mb-2">
+</div>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-ambient border border-outline-variant/30 p-8">
+<form class="space-y-6" id="login-form">
+<!-- Username/Email Field -->
+<div data-i18n="login-div-13">
+<label class="block font-label-md text-label-md text-on-surface mb-2" data-i18n="login-label-10" for="username">
                             Username or Email
                         </label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            name="username"
-                            placeholder="Enter your username or email"
-                            required
-                            class="w-full px-4 py-3 rounded-xl border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-body-md text-body-md transition-all"
-                        />
-                    </div>
-
-                    <!-- Password Field -->
-                    <div>
-                        <label for="password" class="block font-label-md text-label-md text-on-surface mb-2">
+<input class="w-full px-4 py-3 rounded-xl border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-body-md text-body-md transition-all" id="username" name="username" placeholder="Enter your username or email" required="" type="text"/>
+</div>
+<!-- Password Field -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2" data-i18n="login-label-11" for="password">
                             Password
                         </label>
-                        <div class="relative">
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password"
-                                placeholder="Enter your password"
-                                required
-                                class="w-full px-4 py-3 rounded-xl border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-body-md text-body-md transition-all"
-                            />
-                            <button 
-                                type="button"
-                                onclick="togglePassword('password')"
-                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
-                            >
-                                <span class="material-symbols-outlined" id="password-icon">visibility</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Remember Me & Forgot Password -->
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input 
-                                type="checkbox" 
-                                id="remember"
-                                class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                            />
-                            <span class="font-body-sm text-body-sm text-on-surface-variant">Remember me</span>
-                        </label>
-                        <a href="#" class="font-body-sm text-body-sm text-primary hover:underline">
+<div class="relative" data-i18n="login-div-14">
+<input class="w-full px-4 py-3 rounded-xl border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-body-md text-body-md transition-all" id="password" name="password" placeholder="Enter your password" required="" type="password"/>
+<button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors" data-i18n="login-button-5" onclick="togglePassword('password')" type="button">
+<span class="material-symbols-outlined" id="password-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Remember Me & Forgot Password -->
+<div class="flex items-center justify-between" data-i18n="login-div-15">
+<label class="flex items-center gap-2 cursor-pointer" data-i18n="login-label-12">
+<input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-2 focus:ring-primary/20 transition-all" id="remember" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant" data-i18n="login-span-3">Remember me</span>
+</label>
+<a class="font-body-sm text-body-sm text-primary hover:underline" data-i18n="login-a-8" href="#">
                             Forgot password?
                         </a>
-                    </div>
-
-                    <!-- Login Button -->
-                    <button 
-                        type="submit"
-                        class="w-full bg-primary-container text-on-primary px-8 py-3 rounded-xl font-label-md text-label-md hover:bg-surface-tint transition-all shadow-ambient flex items-center justify-center gap-2"
-                    >
+</div>
+<!-- Login Button -->
+<button class="w-full bg-primary-container text-on-primary px-8 py-3 rounded-xl font-label-md text-label-md hover:bg-surface-tint transition-all shadow-ambient flex items-center justify-center gap-2" data-i18n="login-button-6" type="submit">
                         Sign In
                         <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                    </button>
-
-                    <!-- Divider -->
-                    <div class="relative">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-outline-variant"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-surface-container-lowest font-body-sm text-body-sm text-on-surface-variant">
+</button>
+<!-- Divider -->
+<div class="relative">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant"></div>
+</div>
+<div class="relative flex justify-center text-sm" data-i18n="login-div-16">
+<span class="px-4 bg-surface-container-lowest font-body-sm text-body-sm text-on-surface-variant" data-i18n="login-span-4">
                                 New to FractureOrSprain?
                             </span>
-                        </div>
-                    </div>
-
-                    <!-- Sign Up Link -->
-                    <div class="text-center">
-                        <a 
-                            href="signup.html" 
-                            class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-8 py-3 rounded-xl font-label-md text-label-md hover:bg-surface-container transition-all"
-                        >
+</div>
+</div>
+<!-- Sign Up Link -->
+<div class="text-center" data-i18n="login-div-17">
+<a class="inline-flex items-center gap-2 border border-outline-variant text-on-surface px-8 py-3 rounded-xl font-label-md text-label-md hover:bg-surface-container transition-all" data-i18n="login-a-9" href="signup.html">
                             Create Account
                         </a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <script src="../assets/js/i18n.js"></script>
-    <script type="module">
+</div>
+</form>
+</div>
+</div>
+</section>
+<script src="../assets/js/translations-static.js"></script>
+<script src="../assets/js/i18n.js"></script>
+<script type="module">
         import { signInUser, waitForFirebaseInit } from '../assets/js/auth.js';
 
         // Toggle password visibility

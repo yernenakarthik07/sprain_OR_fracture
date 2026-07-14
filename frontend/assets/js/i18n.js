@@ -740,6 +740,13 @@ window.createLanguageSwitcher = function() {
 
 // Run automatically on load
 document.addEventListener('DOMContentLoaded', () => {
+    if (window.staticTranslations) {
+        Object.keys(window.staticTranslations).forEach(lang => {
+            if (window.translations[lang]) {
+                window.translations[lang] = { ...window.translations[lang], ...window.staticTranslations[lang] };
+            }
+        });
+    }
     window.createLanguageSwitcher();
     window.applyTranslations();
 });
