@@ -1,0 +1,15 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/predict-xray",
+            "destination": "https://csp-project-f6aq.onrender.com/api/predict-xray"
+        },
+        {
+            "source": "/api/diagnose",
+            "destination": "https://csp-project-f6aq.onrender.com/api/diagnose"
+        }
+    ],
+    "functions": {
+        "api/chat.js": { "maxDuration": 30 }
+    }
+}

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Diagnosis History | FractureOrSprain?</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="../../assets/css/styles.css"/>
+    <script src="../../assets/js/i18n.js"></script>
+    <script src="../../assets/js/tailwind-config.js"></script>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased overflow-x-hidden">
+    <!-- TopNavBar -->
+    <nav class="fixed top-0 w-full z-50 bg-surface/95 dark:bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 dark:border-outline/20 shadow-sm dark:shadow-none">
+        <div class="flex justify-between items-center h-16 px-margin-desktop max-w-container-max mx-auto">
+            <a href="../../index.html" class="flex items-center gap-2 font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+                <span>FractureOrSprain?</span>
+            </a>
+            <div class="hidden md:flex gap-gutter items-center font-label-md text-label-md">
+                <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-how-it-works" href="../how-it-works/how-it-works.html">How It Works</a>
+                <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-assessment" href="../../index.html#assessment">Assessment</a>
+                <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-examples" href="../../index.html#case-studies">Example Scenarios</a>
+                <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-ai-doctor" href="../ai-doctor/ai-doctor.html">AI Doctor</a>
+                <a class="text-primary dark:text-primary-fixed border-b-2 border-primary pb-1" data-i18n="nav-history" href="history.html">History</a>
+            </div>
+            <button id="logout-button" class="bg-surface-container-high text-on-surface-variant font-label-md text-label-md px-4 py-2 rounded-lg hover:bg-surface-container transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span data-i18n="nav-logout">Log Out</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- History Content Section -->
+    <main class="pt-[90px] pb-stack-lg min-h-screen bg-gradient-to-br from-surface-bright to-surface-container-lowest">
+        <div class="max-w-4xl mx-auto px-margin-desktop">
+            
+            <!-- Dashboard Header -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-stack-md">
+                <div>
+                    <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2" data-i18n="hist-title">Patient Diagnosis History</h1>
+                    <p class="font-body-md text-body-md text-on-surface-variant" data-i18n="hist-desc">
+                        View your past clinical triage and X-Ray analysis records below.
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-3xl">account_circle</span>
+                    <div>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="hist-welcome">Patient Dashboard</p>
+                        <p id="user-email" class="font-label-md text-label-md text-on-surface font-semibold">loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="history-loading" class="text-center py-20">
+                <span class="material-symbols-outlined text-5xl text-primary animate-spin mb-4">progress_activity</span>
+                <p class="font-headline-sm text-headline-sm text-on-surface-variant" data-i18n="hist-loading">Loading your history...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="history-empty" class="hidden text-center py-20 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-8 shadow-ambient">
+                <span class="material-symbols-outlined text-6xl text-on-surface-variant/40 mb-4" style="font-variation-settings: 'FILL' 1;">history</span>
+                <p class="font-headline-sm text-headline-sm text-on-surface mb-2" data-i18n="hist-empty">No past diagnoses found. Start a new assessment on the home page!</p>
+                <a href="../../index.html#assessment" class="mt-6 inline-flex items-center gap-2 bg-primary text-white font-label-md text-label-md px-6 py-3 rounded-xl hover:bg-primary/95 transition-all">
+                    <span data-i18n="nav-start-triage">Start Triage</span>
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </a>
+            </div>
+
+            <!-- History List Container -->
+            <div id="history-list" class="hidden space-y-4">
+                <!-- Cards injected dynamically -->
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Details Modal (Hidden by default) -->
+    <div id="details-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-surface-container-lowest w-full max-w-2xl mx-4 rounded-3xl shadow-elevated border border-outline-variant/30 max-h-[90vh] flex flex-col scale-95 transform transition-transform duration-300" id="modal-container">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-low rounded-t-3xl">
+                <div class="flex items-center gap-3">
+                    <div id="modal-icon-container" class="w-12 h-12 rounded-full flex items-center justify-center text-white">
+                        <span id="modal-icon" class="material-symbols-outlined">medical_services</span>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant uppercase" id="modal-type-label">AI Diagnosis</p>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface" id="modal-title-diagnosis">Fracture</h3>
+                    </div>
+                </div>
+                <button onclick="closeDetailsModal()" class="text-on-surface-variant hover:bg-surface-container-high p-2 rounded-lg transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <!-- Metadata Grid -->
+                <div class="grid grid-cols-2 gap-4 bg-surface-container-low p-4 rounded-2xl border border-outline-variant/20">
+                    <div>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="hist-date">Date</p>
+                        <p class="font-body-md text-body-md text-on-surface font-semibold" id="modal-date">-</p>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="label-confidence">Confidence</p>
+                        <p class="font-body-md text-body-md text-on-surface font-semibold" id="modal-confidence">-</p>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="label-severity">Severity</p>
+                        <p class="font-body-md text-body-md text-on-surface font-semibold" id="modal-severity">-</p>
+                    </div>
+                    <div>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="hist-type">Type</p>
+                        <p class="font-body-md text-body-md text-on-surface font-semibold" id="modal-type">-</p>
+                    </div>
+                </div>
+
+                <!-- Input symptoms / context info -->
+                <div>
+                    <h4 class="font-label-md text-label-md text-on-surface mb-2" data-i18n="hist-symptoms">Reported Symptoms</h4>
+                    <div id="modal-inputs-detail" class="bg-surface-container-lowest border border-outline-variant/20 p-4 rounded-xl font-body-sm text-body-sm text-on-surface-variant">
+                        <!-- Details on pain, location, etc. -->
+                    </div>
+                </div>
+
+                <!-- Actionable Recs -->
+                <div>
+                    <h4 class="font-label-md text-label-md text-on-surface mb-2" data-i18n="btn-next">Recommended Actions</h4>
+                    <div id="modal-action-text" class="bg-surface-container-high p-4 rounded-xl font-body-sm text-body-sm text-on-surface font-medium whitespace-pre-line">
+                        -
+                    </div>
+                </div>
+
+                <!-- Care Steps -->
+                <div id="modal-care-steps-container" class="hidden">
+                    <h4 class="font-label-md text-label-md text-on-surface mb-2" data-i18n="label-care-steps">Care Steps</h4>
+                    <ul id="modal-care-steps-list" class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant pl-4 list-disc">
+                        <!-- Care items -->
+                    </ul>
+                </div>
+
+                <!-- Red Flags -->
+                <div id="modal-red-flags-container" class="hidden">
+                    <h4 class="font-label-md text-label-md text-error mb-2" data-i18n="label-when-help">When to Seek Immediate Help</h4>
+                    <ul id="modal-red-flags-list" class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant pl-4 list-disc">
+                        <!-- Red flags items -->
+                    </ul>
+                </div>
+
+                <!-- Differentials -->
+                <div id="modal-differentials-container" class="hidden">
+                    <h4 class="font-label-md text-label-md text-on-surface mb-2" data-i18n="label-differential">Differential Diagnosis</h4>
+                    <div id="modal-differentials-list" class="flex flex-wrap gap-2">
+                        <!-- Differentials list -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-outline-variant/30 flex justify-end bg-surface-container-low rounded-b-3xl">
+                <button onclick="closeDetailsModal()" class="bg-primary text-white font-label-md text-label-md px-6 py-2.5 rounded-xl hover:bg-primary/90 transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Modules and history logic -->
+    <script type="module" src="../../assets/js/require-auth.js"></script>
+    <script type="module" src="history.js"></script>
+</body>
+</html>
