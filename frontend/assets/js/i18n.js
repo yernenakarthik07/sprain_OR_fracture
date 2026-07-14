@@ -686,7 +686,7 @@ window.setLanguage = function(lang) {
 
 // Initialize translation switcher element
 window.createLanguageSwitcher = function() {
-    const navbar = document.querySelector('nav div.flex.items-center.gap-2');
+    const navbar = document.querySelector('nav .flex.justify-between.items-center');
     if (!navbar) return;
     
     // Check if switcher already exists
