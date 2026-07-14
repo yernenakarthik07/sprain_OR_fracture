@@ -183,6 +183,55 @@ window.openDetailsModal = function(index) {
         : window.translateMedicalItem('rec', diagnosis, null, record.recommended_action);
     document.getElementById('modal-action-text').textContent = recActionText;
 
+    // Medications & Precautions
+    const medContainer = document.getElementById('modal-medications-container');
+    const medText = document.getElementById('modal-medications-text');
+    const transMedications = record.type === 'xray'
+        ? (window.translateMedicalItem('med', 'xray-' + diagnosis, null, record.medications_precautions) || window.translateMedicalItem('med', diagnosis, null, record.medications_precautions))
+        : window.translateMedicalItem('med', diagnosis, null, record.medications_precautions);
+    
+    if (transMedications) {
+        medContainer.classList.remove('hidden');
+        medText.textContent = transMedications;
+    } else {
+        medContainer.classList.add('hidden');
+    }
+
+    // Diet Recommendation
+    const dietContainer = document.getElementById('modal-diet-container');
+    const eatableList = document.getElementById('modal-diet-eatable-list');
+    const nonEatableList = document.getElementById('modal-diet-non-eatable-list');
+    const eatables = record.diet_eatable || [];
+    const nonEatables = record.diet_non_eatable || [];
+
+    if (eatables.length > 0 || nonEatables.length > 0) {
+        dietContainer.classList.remove('hidden');
+        eatableList.innerHTML = '';
+        nonEatableList.innerHTML = '';
+
+        eatables.forEach((item, idx) => {
+            const transItem = record.type === 'xray'
+                ? (window.translateMedicalItem('eat', 'xray-' + diagnosis, idx, item) || window.translateMedicalItem('eat', diagnosis, idx, item))
+                : window.translateMedicalItem('eat', diagnosis, idx, item);
+            const li = document.createElement('li');
+            li.className = 'flex items-start gap-2 text-primary font-medium';
+            li.innerHTML = `✓ <span>${transItem}</span>`;
+            eatableList.appendChild(li);
+        });
+
+        nonEatables.forEach((item, idx) => {
+            const transItem = record.type === 'xray'
+                ? (window.translateMedicalItem('noeat', 'xray-' + diagnosis, idx, item) || window.translateMedicalItem('noeat', diagnosis, idx, item))
+                : window.translateMedicalItem('noeat', diagnosis, idx, item);
+            const li = document.createElement('li');
+            li.className = 'flex items-start gap-2 text-error font-medium';
+            li.innerHTML = `✗ <span>${transItem}</span>`;
+            nonEatableList.appendChild(li);
+        });
+    } else {
+        dietContainer.classList.add('hidden');
+    }
+
     // Care Steps list
     const careStepsContainer = document.getElementById('modal-care-steps-container');
     const careStepsList = document.getElementById('modal-care-steps-list');

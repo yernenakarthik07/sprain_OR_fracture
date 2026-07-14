@@ -236,6 +236,9 @@ async function calculateResult() {
                 care_steps: result.care_steps,
                 when_to_seek_help: result.when_to_seek_help,
                 differential: result.differential,
+                medications_precautions: result.medications_precautions || "",
+                diet_eatable: result.diet_eatable || [],
+                diet_non_eatable: result.diet_non_eatable || [],
                 inputs: {
                     location: assessmentData.location,
                     pain_level: assessmentData.pain_level,
@@ -336,6 +339,29 @@ function displayResult(result) {
     const labelPoweredBy = window.translateValue('res-powered-by', '✓ Powered by ML Model (RandomForest)');
     const labelScrollDown = window.translateValue('res-scroll-down', 'Scroll down to see detailed recommendations');
     
+    // Medications & Precautions
+    const transMedications = window.translateMedicalItem('med', diagnosis, null, result.medications_precautions || '');
+    
+    // Render eatables list dynamically
+    let eatablesHtml = '';
+    const eatables = result.diet_eatable || [];
+    eatables.forEach((item, idx) => {
+        const transItem = window.translateMedicalItem('eat', diagnosis, idx, item);
+        eatablesHtml += `<li class="flex items-start gap-2"><span>${transItem}</span></li>`;
+    });
+    
+    // Render non-eatables list dynamically
+    let nonEatablesHtml = '';
+    const nonEatables = result.diet_non_eatable || [];
+    nonEatables.forEach((item, idx) => {
+        const transItem = window.translateMedicalItem('noeat', diagnosis, idx, item);
+        nonEatablesHtml += `<li class="flex items-start gap-2"><span>${transItem}</span></li>`;
+    });
+    
+    const labelMedications = window.translateValue('label-medications', 'Medications & Precautions');
+    const labelEatables = window.translateValue('label-eatables', 'Recommended Diet (Eatable)');
+    const labelNonEatables = window.translateValue('label-non-eatables', 'Diet Restrictions (Non-Eatable)');
+    
     const resultHTML = `
         <div class="p-2">
             <div class="flex items-center justify-between mb-6">
@@ -373,9 +399,50 @@ function displayResult(result) {
                 </div>
             </div>
             
+            <!-- Medications & Precautions -->
+            ${transMedications ? `
+            <div class="mb-4 border-t border-outline-variant/20 pt-4">
+                <p class="font-label-md text-label-md text-on-surface mb-2">${labelMedications}:</p>
+                <div class="bg-primary/5 p-4 rounded-xl border border-primary/20">
+                    <p class="font-body-sm text-body-sm text-on-surface-variant whitespace-pre-line">${transMedications}</p>
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Diet Recommendations (Eatables & Non-Eatables) -->
+            ${(eatablesHtml || nonEatablesHtml) ? `
+            <div class="mb-4 border-t border-outline-variant/20 pt-4">
+                <p class="font-label-md text-label-md text-on-surface mb-3">${window.translateValue('label-diet-recommendations', 'Dietary Guide (Recovery)')}:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${eatablesHtml ? `
+                    <div class="bg-primary-container/20 p-4 rounded-xl border border-primary/10">
+                        <p class="font-label-sm text-label-sm text-primary mb-2 flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-[18px]">restaurant</span>
+                            ${labelEatables}
+                        </p>
+                        <ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant pl-2">
+                            ${eatablesHtml.replace(/<li/g, '<li class="flex items-start gap-2 text-primary font-medium">✓')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    ${nonEatablesHtml ? `
+                    <div class="bg-error-container/20 p-4 rounded-xl border border-error/10">
+                        <p class="font-label-sm text-label-sm text-error mb-2 flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-[18px]">no_meals</span>
+                            ${labelNonEatables}
+                        </p>
+                        <ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant pl-2">
+                            ${nonEatablesHtml.replace(/<li/g, '<li class="flex items-start gap-2 text-error font-medium">✗')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            ` : ''}
+            
             <!-- Care Steps -->
             ${careStepsHtml ? `
-            <div class="mb-4">
+            <div class="mb-4 border-t border-outline-variant/20 pt-4">
                 <p class="font-label-md text-label-md text-on-surface mb-2">${labelCareSteps}:</p>
                 <ul class="space-y-1 font-body-sm text-body-sm text-on-surface-variant pl-2">
                     ${careStepsHtml}
@@ -605,6 +672,9 @@ async function analyzeXray() {
                 care_steps: result.care_steps,
                 when_to_seek_help: result.when_to_seek_help,
                 differential: result.differential,
+                medications_precautions: result.medications_precautions || "",
+                diet_eatable: result.diet_eatable || [],
+                diet_non_eatable: result.diet_non_eatable || [],
                 inputs: {
                     location: xrayData.location,
                     file_name: xrayData.file ? xrayData.file.name : 'xray_image.png'
@@ -677,6 +747,29 @@ function displayXrayResult(result) {
     const labelDifferential = window.translateValue('label-differential', 'Differential Diagnosis');
     const labelDisclaimer = window.translateValue('res-xray-disclaimer', 'This is an AI preliminary analysis. Always consult a radiologist for official diagnosis.');
     
+    // Medications & Precautions
+    const transMedications = window.translateMedicalItem('med', 'xray-' + diagnosis, null, result.medications_precautions || '') || window.translateMedicalItem('med', diagnosis, null, result.medications_precautions || '');
+    
+    // Render eatables list dynamically
+    let eatablesHtml = '';
+    const eatables = result.diet_eatable || [];
+    eatables.forEach((item, idx) => {
+        const transItem = window.translateMedicalItem('eat', 'xray-' + diagnosis, idx, item) || window.translateMedicalItem('eat', diagnosis, idx, item);
+        eatablesHtml += `<li class="flex items-start gap-2"><span>${transItem}</span></li>`;
+    });
+    
+    // Render non-eatables list dynamically
+    let nonEatablesHtml = '';
+    const nonEatables = result.diet_non_eatable || [];
+    nonEatables.forEach((item, idx) => {
+        const transItem = window.translateMedicalItem('noeat', 'xray-' + diagnosis, idx, item) || window.translateMedicalItem('noeat', diagnosis, idx, item);
+        nonEatablesHtml += `<li class="flex items-start gap-2"><span>${transItem}</span></li>`;
+    });
+    
+    const labelMedications = window.translateValue('label-medications', 'Medications & Precautions');
+    const labelEatables = window.translateValue('label-eatables', 'Recommended Diet (Eatable)');
+    const labelNonEatables = window.translateValue('label-non-eatables', 'Diet Restrictions (Non-Eatable)');
+    
     const resultHTML = `
         <div class="p-2">
             <div class="flex items-center justify-between mb-6">
@@ -718,9 +811,50 @@ function displayXrayResult(result) {
                 </div>
             </div>
             
+            <!-- Medications & Precautions -->
+            ${transMedications ? `
+            <div class="mb-4 border-t border-outline-variant/20 pt-4">
+                <p class="font-label-md text-label-md text-on-surface mb-2">${labelMedications}:</p>
+                <div class="bg-primary/5 p-4 rounded-xl border border-primary/20">
+                    <p class="font-body-sm text-body-sm text-on-surface-variant whitespace-pre-line">${transMedications}</p>
+                </div>
+            </div>
+            ` : ''}
+
+            <!-- Diet Recommendations (Eatables & Non-Eatables) -->
+            ${(eatablesHtml || nonEatablesHtml) ? `
+            <div class="mb-4 border-t border-outline-variant/20 pt-4">
+                <p class="font-label-md text-label-md text-on-surface mb-3">${window.translateValue('label-diet-recommendations', 'Dietary Guide (Recovery)')}:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${eatablesHtml ? `
+                    <div class="bg-primary-container/20 p-4 rounded-xl border border-primary/10">
+                        <p class="font-label-sm text-label-sm text-primary mb-2 flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-[18px]">restaurant</span>
+                            ${labelEatables}
+                        </p>
+                        <ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant pl-2">
+                            ${eatablesHtml.replace(/<li/g, '<li class="flex items-start gap-2 text-primary font-medium">✓')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    ${nonEatablesHtml ? `
+                    <div class="bg-error-container/20 p-4 rounded-xl border border-error/10">
+                        <p class="font-label-sm text-label-sm text-error mb-2 flex items-center gap-1 font-bold">
+                            <span class="material-symbols-outlined text-[18px]">no_meals</span>
+                            ${labelNonEatables}
+                        </p>
+                        <ul class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant pl-2">
+                            ${nonEatablesHtml.replace(/<li/g, '<li class="flex items-start gap-2 text-error font-medium">✗')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                </div>
+            </div>
+            ` : ''}
+            
             <!-- Care Steps -->
             ${careStepsHtml ? `
-            <div class="mb-4">
+            <div class="mb-4 border-t border-outline-variant/20 pt-4">
                 <p class="font-label-md text-label-md text-on-surface mb-2">${labelCareSteps}:</p>
                 <ul class="space-y-1 font-body-sm text-body-sm text-on-surface-variant pl-2">
                     ${careStepsHtml}

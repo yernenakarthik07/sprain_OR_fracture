@@ -105,6 +105,63 @@ DIFFERENTIALS = {
     ]
 }
 
+MEDICATIONS_PRECAUTIONS = {
+    "fracture": (
+        "Consult a doctor before taking pain relievers as some (like NSAIDs) might delay early bone healing. "
+        "Doctors commonly prescribe Paracetamol (Acetaminophen) for initial pain management. "
+        "Take calcium and Vitamin D supplements to aid bone reconstruction."
+    ),
+    "sprain": (
+        "Over-the-counter pain relievers like Ibuprofen or Paracetamol can help reduce pain and swelling. "
+        "Always follow package dosage and consult a pharmacist. "
+        "Do not use pain relievers to mask pain and resume activity too early."
+    ),
+    "normal": (
+        "Paracetamol can be taken for mild discomfort. Avoid unnecessary medication if pain is manageable. "
+        "Consult a doctor if pain worsens."
+    )
+}
+
+DIET_EATABLE = {
+    "fracture": [
+        "Calcium-rich foods (milk, cheese, yogurt, leafy greens)",
+        "Vitamin C (oranges, strawberries, bell peppers) to make collagen",
+        "Vitamin D (eggs, fatty fish, fortified dairy) for calcium absorption",
+        "Protein (chicken, fish, beans, tofu) for muscle & bone repair"
+    ],
+    "sprain": [
+        "Anti-inflammatory foods (berries, fatty fish, walnuts, olive oil)",
+        "Vitamin C-rich foods to help rebuild ligament tissues",
+        "Zinc (nuts, seeds, whole grains) to support healing",
+        "Plenty of water to keep joints hydrated"
+    ],
+    "normal": [
+        "Balanced diet with lean proteins",
+        "Hydrating fluids",
+        "Fresh fruits and vegetables"
+    ]
+}
+
+DIET_NON_EATABLE = {
+    "fracture": [
+        "Alcohol (slows down bone building cells)",
+        "Excessive salt/sodium (increases calcium loss in urine)",
+        "Excessive caffeine (interferes with calcium absorption)",
+        "Sugary and highly processed foods"
+    ],
+    "sprain": [
+        "Highly processed foods & trans fats (increases inflammation)",
+        "Excessive sugar and sugary drinks",
+        "Alcohol (can increase swelling and slow recovery)",
+        "Excessive caffeine"
+    ],
+    "normal": [
+        "Excessive junk food",
+        "Sugary drinks",
+        "Alcohol"
+    ]
+}
+
 
 def predict_injury(symptoms: dict) -> dict:
     """
@@ -135,6 +192,9 @@ def predict_injury(symptoms: dict) -> dict:
         care_steps        - list of strings
         when_to_seek_help - list of strings
         differential      - list of strings
+        medications_precautions - string
+        diet_eatable      - list of strings
+        diet_non_eatable  - list of strings
     """
     payload = _load()
     model   = payload["model"]
@@ -160,12 +220,15 @@ def predict_injury(symptoms: dict) -> dict:
     }
 
     return {
-        "diagnosis":          diagnosis,
-        "confidence":         round(confidence, 4),
-        "probabilities":      all_proba,
-        "recommended_action": RECOMMENDATIONS.get(diagnosis, "Please consult a doctor."),
-        "severity":           SEVERITY.get(diagnosis, "Medium"),
-        "care_steps":         CARE_STEPS.get(diagnosis, []),
-        "when_to_seek_help":  WHEN_TO_SEEK_HELP.get(diagnosis, []),
-        "differential":       DIFFERENTIALS.get(diagnosis, []),
+        "diagnosis":              diagnosis,
+        "confidence":             round(confidence, 4),
+        "probabilities":          all_proba,
+        "recommended_action":     RECOMMENDATIONS.get(diagnosis, "Please consult a doctor."),
+        "severity":               SEVERITY.get(diagnosis, "Medium"),
+        "care_steps":             CARE_STEPS.get(diagnosis, []),
+        "when_to_seek_help":      WHEN_TO_SEEK_HELP.get(diagnosis, []),
+        "differential":           DIFFERENTIALS.get(diagnosis, []),
+        "medications_precautions": MEDICATIONS_PRECAUTIONS.get(diagnosis, ""),
+        "diet_eatable":           DIET_EATABLE.get(diagnosis, []),
+        "diet_non_eatable":       DIET_NON_EATABLE.get(diagnosis, []),
     }

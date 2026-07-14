@@ -641,8 +641,12 @@ window.currentLanguage = localStorage.getItem('selectedLanguage') || 'en';
 
 // Helper to translate dynamic backend recommendations or strings
 window.translateValue = function(key, defaultValue) {
-    if (!window.translations[window.currentLanguage]) return defaultValue || key;
-    return window.translations[window.currentLanguage][key] || defaultValue || key;
+    const lang = window.currentLanguage;
+    if (window.dietMedicationsTranslations && window.dietMedicationsTranslations[lang] && window.dietMedicationsTranslations[lang][key]) {
+        return window.dietMedicationsTranslations[lang][key];
+    }
+    if (!window.translations[lang]) return defaultValue || key;
+    return window.translations[lang][key] || defaultValue || key;
 };
 
 // Function to translate the entire DOM
@@ -653,7 +657,7 @@ window.applyTranslations = function() {
     const elements = document.querySelectorAll('[data-i18n]');
     elements.forEach(element => {
         const key = element.getAttribute('data-i18n');
-        const translation = window.translations[window.currentLanguage][key];
+        const translation = window.translateValue(key, null);
         
         if (translation) {
             // Check if element is an input with placeholder
@@ -984,6 +988,13 @@ window.medicalTranslations = {
 // Translate medical elements based on code mapping
 window.translateMedicalItem = function(type, diagnosis, index, defaultValue) {
     const lang = window.currentLanguage;
+    
+    // Check diet/medications dictionary first
+    const lookupKey = (index !== null && index !== undefined) ? `${type}-${diagnosis}-${index}` : `${type}-${diagnosis}`;
+    if (window.dietMedicationsTranslations && window.dietMedicationsTranslations[lang] && window.dietMedicationsTranslations[lang][lookupKey]) {
+        return window.dietMedicationsTranslations[lang][lookupKey];
+    }
+    
     const key = `${type}-${diagnosis}-${index}`;
     if (window.medicalTranslations[lang] && window.medicalTranslations[lang][key]) {
         return window.medicalTranslations[lang][key];
@@ -993,5 +1004,238 @@ window.translateMedicalItem = function(type, diagnosis, index, defaultValue) {
         return window.medicalTranslations[lang][recKey];
     }
     return defaultValue;
+};
+
+window.dietMedicationsTranslations = {
+    en: {
+        "label-medications": "Medications & Precautions",
+        "label-eatables": "Recommended Diet (Eatable)",
+        "label-non-eatables": "Diet Restrictions (Non-Eatable)",
+        "med-fracture": "Consult a doctor before taking pain relievers as some (like NSAIDs) might delay early bone healing. Doctors commonly prescribe Paracetamol (Acetaminophen) for initial pain management. Take calcium and Vitamin D supplements to aid bone reconstruction.",
+        "med-sprain": "Over-the-counter pain relievers like Ibuprofen or Paracetamol can help reduce pain and swelling. Always follow package dosage and consult a pharmacist. Do not use pain relievers to mask pain and resume activity too early.",
+        "med-normal": "Paracetamol can be taken for mild discomfort. Avoid unnecessary medication if pain is manageable. Consult a doctor if pain worsens.",
+        "med-xray-fracture": "Consult a doctor before taking pain relievers as some (like NSAIDs) might delay early bone healing. Doctors commonly prescribe Paracetamol (Acetaminophen) for initial pain management. Take calcium and Vitamin D supplements to aid bone reconstruction.",
+        "med-xray-normal": "Paracetamol can be taken for mild discomfort. Avoid unnecessary medication if pain is manageable. Consult a doctor if pain worsens.",
+        "eat-fracture-0": "Calcium-rich foods (milk, cheese, yogurt, leafy greens)",
+        "eat-fracture-1": "Vitamin C (oranges, strawberries, bell peppers) to make collagen",
+        "eat-fracture-2": "Vitamin D (eggs, fatty fish, fortified dairy) for calcium absorption",
+        "eat-fracture-3": "Protein (chicken, fish, beans, tofu) for muscle & bone repair",
+        "eat-sprain-0": "Anti-inflammatory foods (berries, fatty fish, walnuts, olive oil)",
+        "eat-sprain-1": "Vitamin C-rich foods to help rebuild ligament tissues",
+        "eat-sprain-2": "Zinc (nuts, seeds, whole grains) to support healing",
+        "eat-sprain-3": "Plenty of water to keep joints hydrated",
+        "eat-normal-0": "Balanced diet with lean proteins",
+        "eat-normal-1": "Hydrating fluids",
+        "eat-normal-2": "Fresh fruits and vegetables",
+        "eat-xray-fracture-0": "Calcium-rich foods (milk, cheese, yogurt, leafy greens)",
+        "eat-xray-fracture-1": "Vitamin C (oranges, strawberries, bell peppers) to make collagen",
+        "eat-xray-fracture-2": "Vitamin D (eggs, fatty fish, fortified dairy) for calcium absorption",
+        "eat-xray-fracture-3": "Protein (chicken, fish, beans, tofu) for muscle & bone repair",
+        "eat-xray-normal-0": "Balanced diet with lean proteins",
+        "eat-xray-normal-1": "Hydrating fluids",
+        "eat-xray-normal-2": "Fresh fruits and vegetables",
+        "noeat-fracture-0": "Alcohol (slows down bone building cells)",
+        "noeat-fracture-1": "Excessive salt/sodium (increases calcium loss in urine)",
+        "noeat-fracture-2": "Excessive caffeine (interferes with calcium absorption)",
+        "noeat-fracture-3": "Sugary and highly processed foods",
+        "noeat-sprain-0": "Highly processed foods & trans fats (increases inflammation)",
+        "noeat-sprain-1": "Excessive sugar and sugary drinks",
+        "noeat-sprain-2": "Alcohol (can increase swelling and slow recovery)",
+        "noeat-sprain-3": "Excessive caffeine",
+        "noeat-normal-0": "Excessive junk food",
+        "noeat-normal-1": "Sugary drinks",
+        "noeat-normal-2": "Alcohol",
+        "noeat-xray-fracture-0": "Alcohol (slows down bone building cells)",
+        "noeat-xray-fracture-1": "Excessive salt/sodium (increases calcium loss in urine)",
+        "noeat-xray-fracture-2": "Excessive caffeine (interferes with calcium absorption)",
+        "noeat-xray-fracture-3": "Sugary and highly processed foods",
+        "noeat-xray-normal-0": "Excessive junk food",
+        "noeat-xray-normal-1": "Sugary drinks",
+        "noeat-xray-normal-2": "Alcohol"
+    },
+    hi: {
+        "label-medications": "दवाएं और सावधानियां",
+        "label-eatables": "अनुशंसित आहार (खाएं)",
+        "label-non-eatables": "परहेज करें (न खाएं)",
+        "med-fracture": "अस्थि-भंग के बाद दर्द निवारक (NSAIDs) लेने से पहले डॉक्टर से सलाह लें क्योंकि ये हड्डी जुड़ने की शुरुआती प्रक्रिया को धीमा कर सकते हैं। डॉक्टर आमतौर पर शुरुआती दर्द प्रबंधन के लिए पैरासिटामोल लिखते हैं। हड्डी के पुनर्निर्माण में सहायता के लिए कैल्शियम और विटामिन डी सप्लीमेंट लें।",
+        "med-sprain": "इबुप्रोफेन या पैरासिटामोल जैसी बिना पर्चे की दर्द निवारक दवाएं दर्द और सूजन को कम करने में मदद कर सकती हैं। हमेशा पैक खुराक का पालन करें। गतिविधि को जल्द शुरू करने के लिए दर्द को छिपाने हेतु इनका अनुचित उपयोग न करें।",
+        "med-normal": "हल्की परेशानी के लिए पैरासिटामोल लिया जा सकता है। यदि दर्द सहने योग्य है तो अनावश्यक दवाओं से बचें। दर्द बढ़ने पर डॉक्टर से सलाह लें।",
+        "med-xray-fracture": "अस्थि-भंग के बाद दर्द निवारक (NSAIDs) लेने से पहले डॉक्टर से सलाह लें क्योंकि ये हड्डी जुड़ने की शुरुआती प्रक्रिया को धीमा कर सकते हैं। डॉक्टर आमतौर पर शुरुआती दर्द प्रबंधन के लिए पैरासिटामोल लिखते हैं। हड्डी के पुनर्निर्माण में सहायता के लिए कैल्शियम और विटामिन डी सप्लीमेंट लें।",
+        "med-xray-normal": "हल्की परेशानी के लिए पैरासिटामोल लिया जा सकता है। यदि दर्द सहने योग्य है तो अनावश्यक दवाओं से बचें। दर्द बढ़ने पर डॉक्टर से सलाह लें।",
+        "eat-fracture-0": "कैल्शियम युक्त खाद्य पदार्थ (दूध, पनीर, दही, हरी पत्तेदार सब्जियां)",
+        "eat-fracture-1": "विटामिन सी (संतरा, स्ट्रॉबेरी, शिमला मिर्च) कोलेजन बनाने के लिए",
+        "eat-fracture-2": "विटामिन डी (अंडे, वसायुक्त मछली, फोर्टिफाइड डेयरी) कैल्शियम अवशोषण के लिए",
+        "eat-fracture-3": "प्रोटीन (चिकन, मछली, बीन्स, टोफू) मांसपेशियों और हड्डियों की मरम्मत के लिए",
+        "eat-sprain-0": "सूजनरोधी खाद्य पदार्थ (जामुन, वसायुक्त मछली, अखरोट, जैतून का तेल)",
+        "eat-sprain-1": "लिगामेंट ऊतकों के पुनर्निर्माण में मदद के लिए विटामिन सी युक्त खाद्य पदार्थ",
+        "eat-sprain-2": "जल्दी ठीक होने में सहायता के लिए जिंक (अखरोट, बीज, साबुत अनाज)",
+        "eat-sprain-3": "जोड़ों को हाइड्रेटेड रखने के लिए प्रचुर मात्रा में पानी",
+        "eat-normal-0": "लीन प्रोटीन के साथ संतुलित आहार",
+        "eat-normal-1": "हाइड्रेटिंग तरल पदार्थ और पानी",
+        "eat-normal-2": "ताजे फल और सब्जियां",
+        "eat-xray-fracture-0": "कैल्शियम युक्त खाद्य पदार्थ (दूध, पनीर, दही, हरी पत्तेदार सब्जियां)",
+        "eat-xray-fracture-1": "विटामिन सी (संतरा, स्ट्रॉबेरी, शिमला मिर्च) कोलेजन बनाने के लिए",
+        "eat-xray-fracture-2": "विटामिन डी (अंडे, वसायुक्त मछली, फोर्टिफाइड डेयरी) कैल्शियम अवशोषण के लिए",
+        "eat-xray-fracture-3": "प्रोटीन (चिकन, मछली, बीन्स, टोफू) मांसपेशियों और हड्डियों की मरम्मत के लिए",
+        "eat-xray-normal-0": "लीन प्रोटीन के साथ संतुलित आहार",
+        "eat-xray-normal-1": "हाइड्रेटिंग तरल पदार्थ और पानी",
+        "eat-xray-normal-2": "ताजे फल और सब्जियां",
+        "noeat-fracture-0": "शराब (हड्डी बनाने वाली कोशिकाओं को धीमा करती है)",
+        "noeat-fracture-1": "अत्यधिक नमक/सोडियम (मूत्र में कैल्शियम के नुकसान को बढ़ाता है)",
+        "noeat-fracture-2": "अत्यधिक कैफीन (कैल्शियम के अवशोषण में बाधा डालता है)",
+        "noeat-fracture-3": "मीठा और अत्यधिक प्रसंस्कृत भोजन (processed food)",
+        "noeat-sprain-0": "अत्यधिक प्रसंस्कृत खाद्य पदार्थ और ट्रांस फैट (सूजन बढ़ाता है)",
+        "noeat-sprain-1": "अत्यधिक चीनी और मीठे पेय पदार्थ",
+        "noeat-sprain-2": "शराब (सूजन बढ़ा सकती है और ठीक होने की गति धीमी कर सकती है)",
+        "noeat-sprain-3": "अत्यधिक कैफीन",
+        "noeat-normal-0": "अत्यधिक जंक फूड",
+        "noeat-normal-1": "मीठे पेय पदार्थ",
+        "noeat-normal-2": "शराब",
+        "noeat-xray-fracture-0": "शराब (हड्डी बनाने वाली कोशिकाओं को धीमा करती है)",
+        "noeat-xray-fracture-1": "अत्यधिक नमक/सोडियम (मूत्र में कैल्शियम के नुकसान को बढ़ाता है)",
+        "noeat-xray-fracture-2": "अत्यधिक कैफीन (कैल्शियम के अवशोषण में बाधा डालता है)",
+        "noeat-xray-fracture-3": "मीठा और अत्यधिक प्रसंस्कृत भोजन (processed food)",
+        "noeat-xray-normal-0": "अत्यधिक जंक फूड",
+        "noeat-xray-normal-1": "मीठे पेय पदार्थ",
+        "noeat-xray-normal-2": "शराब"
+    },
+    te: {
+        "label-medications": "మందులు & జాగ్రత్తలు",
+        "label-eatables": "తీసుకోవలసిన ఆహారం (తినండి)",
+        "label-non-eatables": "నివారించాల్సిన ఆహారం (తినవద్దు)",
+        "med-fracture": "ఎముక విరిగిన తర్వాత పెయిన్ కిల్లర్స్ (NSAIDs) తీసుకునే ముందు డాక్టర్ ని సంప్రదించండి, ఎందుకంటే ఇవి ఎముక త్వరగా అతుక్కోవడాన్ని ఆలస్యం చేయవచ్చు. డాక్టర్ సాధారణంగా పారాసెటమాల్ ప్రిస్క్రైబ్ చేస్తారు. ఎముకల బలానికి కాల్షియం, విటమిన్ డి సప్లిమెంట్లు తీసుకోండి.",
+        "med-sprain": "నొప్పి మరియు వాపును తగ్గించడానికి ఐబూప్రోఫెన్ లేదా పారాసెటమాల్ వంటి పెయిన్ కిల్లర్స్ సహాయపడతాయి. మోతాదుల కోసం ప్యాకేజీ సూచనలను అనుసరించండి. నొప్పి తెలియకుండా పనులు తొందరగా మొదలు పెట్టడానికి వీటిని వాడొద్దు.",
+        "med-normal": "తేలికపాటి నొప్పి ఉన్నప్పుడు పారాసెటమాల్ ఉపయోగించవచ్చు. నొప్పి తక్కువగా ఉంటే అవసరం లేని మందులను నివారించండి. నొప్పి ఎక్కువైతే డాక్టర్ ని సంప్రదించండి.",
+        "med-xray-fracture": "ఎముక విరిగిన తర్వాత పెయిన్ కిల్లర్స్ (NSAIDs) తీసుకునే ముందు డాక్టర్ ని సంప్రదించండి, ఎందుకంటే ఇవి ఎముక త్వరగా అతుక్కోవడాన్ని ఆలస్యం చేయవచ్చు. డాక్టర్ సాధారణంగా పారాసెటమాల్ ప్రిస్క్రైబ్ చేస్తారు. ఎముకల బలానికి కాల్షియం, విటమిన్ డి సప్లిమెంట్లు తీసుకోండి.",
+        "med-xray-normal": "తేలికపాటి నొప్పి ఉన్నప్పుడు పారాసెటమాల్ ఉపయోగించవచ్చు. నొప్పి తక్కువగా ఉంటే అవసరం లేని మందులను నివారించండి. నొప్పి ఎక్కువైతే డాక్టర్ ని సంప్రదించండి.",
+        "eat-fracture-0": "కాల్షియం ఎక్కువగా ఉండే ఆహారాలు (పాలు, జున్ను, పెరుగు, ఆకుకూరలు)",
+        "eat-fracture-1": "వికలాంగ కణజాలానికి కొల్లాజెన్ తయారీకి విటమిన్ సి (నారింజ, స్ట్రాబెర్రీ, బెల్ పెప్పర్స్)",
+        "eat-fracture-2": "కాల్షియం గ్రహణానికి విటమిన్ డి (గుడ్లు, కొవ్వు చేపలు, బలవర్ధకమైన పాలు)",
+        "eat-fracture-3": "ప్రోటీన్ (చికెన్, చేపలు, బీన్స్, తోఫు) కండరాలు మరియు ఎముకల పునర్నిర్మాణానికి",
+        "eat-sprain-0": "యాంటీ ఇన్ఫ్లమేటరీ ఆహారాలు (బెర్రీలు, కొవ్వు చేపలు, వాల్ నట్స్, ఆలివ్ ఆయిల్)",
+        "eat-sprain-1": "లిగమెంట్ కణజాలం పునర్నిర్మాణానికి విటమిన్ సి అధికంగా ఉండే ఆహారాలు",
+        "eat-sprain-2": "త్వరగా కోలుకోవడానికి జింక్ (బాదం, గింజలు, తృణధాన్యాలు)",
+        "eat-sprain-3": "కీళ్లను తేమగా ఉంచడానికి తగినంత నీరు",
+        "eat-normal-0": "ప్రోటీన్ లతో కూడిన సమతుల్య ఆహారం",
+        "eat-normal-1": "హైడ్రేటింగ్ ద్రవాలు మరియు నీరు",
+        "eat-normal-2": "తాజా పండ్లు మరియు కూరగాయలు",
+        "eat-xray-fracture-0": "కాల్షియం ఎక్కువగా ఉండే ఆహారాలు (పాలు, జున్ను, పెరుగు, ఆకుకూరలు)",
+        "eat-xray-fracture-1": "వికలాంగ కణజాలానికి కొల్లాజెన్ తయారీకి విటమిన్ సి (నారింజ, స్ట్రాబెర్రీ, బెల్ పెప్పర్స్)",
+        "eat-xray-fracture-2": "కాల్షియం గ్రహణానికి విటమిన్ డి (గుడ్లు, కొవ్వు చేపలు, బలవర్ధకమైన పాలు)",
+        "eat-xray-fracture-3": "ప్రోటీన్ (చికెన్, చేపలు, బీన్స్, తోఫు) కండరాలు మరియు ఎముకల పునర్నిర్మాణానికి",
+        "eat-xray-normal-0": "ప్రోటీన్ లతో కూడిన సమతుల్య ఆహారం",
+        "eat-xray-normal-1": "హైడ్రేటింగ్ ద్రవాలు మరియు నీరు",
+        "eat-xray-normal-2": "తాజా పండ్లు మరియు కూరగాయలు",
+        "noeat-fracture-0": "మద్యపానం (ఎముకలు పెరిగే కణాలను నెమ్మదిస్తుంది)",
+        "noeat-fracture-1": "ఎక్కువ ఉప్పు/సోడియం (మూత్రంలో కాల్షియం నష్టాన్ని పెంచుతుంది)",
+        "noeat-fracture-2": "ఎక్కువ కెఫిన్ (కాల్షియం గ్రహించడాన్ని అడ్డుకుంటుంది)",
+        "noeat-fracture-3": "చక్కెర ఎక్కువగా ఉండే మరియు నిల్వ ఉంచిన ప్రాసెస్డ్ ఆహారాలు",
+        "noeat-sprain-0": "అతిగా ప్రాసెస్ చేసిన ఆహారాలు మరియు ట్రాన్స్ ఫ్యాట్స్ (వాపును పెంచుతాయి)",
+        "noeat-sprain-1": "ఎక్కువ చక్కెర మరియు చక్కెర పానీయాలు",
+        "noeat-sprain-2": "మద్యపానం (వాపును పెంచుతుంది మరియు రికవరీని ఆలస్యం చేస్తుంది)",
+        "noeat-sprain-3": "ఎక్కువ కెఫిన్",
+        "noeat-normal-0": "జంక్ ఫుడ్స్",
+        "noeat-normal-1": "చక్కెర పానీయాలు",
+        "noeat-normal-2": "మద్యపానం",
+        "noeat-xray-fracture-0": "మద్యపానం (ఎముకలు పెరిగే కణాలను నెమ్మదిస్తుంది)",
+        "noeat-xray-fracture-1": "ఎక్కువ ఉప్పు/సోడియం (మూత్రంలో కాల్షియం నష్టాన్ని పెంచుతుంది)",
+        "noeat-xray-fracture-2": "ఎక్కువ కెఫిన్ (కాల్షియం గ్రహించడాన్ని అడ్డుకుంటుంది)",
+        "noeat-xray-fracture-3": "చక్కెర ఎక్కువగా ఉండే మరియు నిల్వ ఉంచిన ప్రాసెస్డ్ ఆహారాలు",
+        "noeat-xray-normal-0": "జంక్ ఫుడ్స్",
+        "noeat-xray-normal-1": "చక్కెర పానీయాలు",
+        "noeat-xray-normal-2": "మద్యపానం"
+    },
+    ta: {
+        "label-medications": "மருந்துகள் & முன்னெச்சரிக்கைகள்",
+        "label-eatables": "பரிந்துரைக்கப்பட்ட உணவு (உண்ணவும்)",
+        "label-non-eatables": "தவிர்க்க வேண்டிய உணவு (உண்ணக் கூடாது)",
+        "med-fracture": "எலும்பு முறிவுக்குப் பின் வலி நிவாரணிகளை (NSAIDs) எடுத்துக்கொள்வதற்கு முன் மருத்துவரை அணுகவும், ஏனெனில் இவை எலும்பு கூடுவதை தாமதப்படுத்தலாம். ஆரம்ப வலிக்கு பாராசிட்டமால் பொதுவாக பரிந்துரைக்கப்படுகிறது. எலும்பு மீளுருவாக்கத்திற்கு கால்சியம் மற்றும் வைட்டமின் டி சப்ளிமெண்ட்ஸ் எடுக்கவும்.",
+        "med-sprain": "வலி மற்றும் வீக்கத்தைக் குறைக்க ஐபுபுரூஃபன் அல்லது பாராசிட்டமால் போன்ற மருந்துகள் உதவலாம். பேக்கேஜில் உள்ள அளவைப் பின்பற்றவும். வலி தெரியாமல் இருக்க இவற்றைத் தேவையின்றி பயன்படுத்தக் கூடாது.",
+        "med-normal": "லேசான வலிக்கு பாராசிட்டமால் எடுக்கலாம். வலி குறைவாக இருந்தால் தேவையற்ற மருந்துகளைத் தவிர்க்கவும். வலி அதிகரித்தால் மருத்துவரை அணுகவும்.",
+        "med-xray-fracture": "எலும்பு முறிவுக்குப் பின் வலி நிவாரணிகளை (NSAIDs) எடுத்துக்கொள்வதற்கு முன் மருத்துவரை அணுகவும், ஏனெனில் இவை எலும்பு கூடுவதை தாமதப்படுத்தலாம். ஆரம்ப வலிக்கு பாராசிட்டமால் பொதுவாக பரிந்துரைக்கப்படுகிறது. எலும்பு மீளுருவாக்கத்திற்கு கால்சியம் மற்றும் வைட்டமின் டி சப்ளிமெண்ட்ஸ் எடுக்கவும்.",
+        "med-xray-normal": "லேசான வலிக்கு பாராசிட்டமால் எடுக்கலாம். வலி குறைவாக இருந்தால் தேவையற்ற மருந்துகளைத் தவிர்க்கவும். வலி அதிகரித்தால் மருத்துவரை அணுகவும்.",
+        "eat-fracture-0": "கால்சியம் நிறைந்த உணவுகள் (பால், சீஸ், தயிர், கீரைகள்)",
+        "eat-fracture-1": "கொலாஜன் உற்பத்திக்கு வைட்டமின் சி நிறைந்த பழங்கள் (ஆரஞ்சு, குடைமிளகாய்)",
+        "eat-fracture-2": "கால்சியம் உறிஞ்சுதலுக்கு வைட்டமின் டி நிறைந்த உணவுகள் (முட்டை, மீன்)",
+        "eat-fracture-3": "எலும்பு மற்றும் தசை பழுதுபார்ப்புக்கு புரதம் நிறைந்த உணவுகள் (பருப்புகள், மீன், சிக்கன்)",
+        "eat-sprain-0": "அழற்சி எதிர்ப்பு உணவுகள் (பெர்ரிகள், கொழுப்பு மீன்கள், அக்ரூட் பருப்புகள், ஆலிவ் எண்ணெய்)",
+        "eat-sprain-1": "தசைநார் திசுக்களை மீண்டும் உருவாக்க வைட்டமின் சி நிறைந்த உணவுகள்",
+        "eat-sprain-2": "விரைவாக குணமடைய துத்தநாகம் (zinc) நிறைந்த உணவுகள் (கொட்டைகள், விதைகள்)",
+        "eat-sprain-3": "மூட்டுகளை நீரேற்றமாக வைத்திருக்க போதுமான தண்ணீர்",
+        "eat-normal-0": "புரதச்சத்து நிறைந்த சமச்சீர் உணவு",
+        "eat-normal-1": "நீரேற்றத்திற்கு போதுமான திரவங்கள் மற்றும் தண்ணீர்",
+        "eat-normal-2": "புதிய பழங்கள் மற்றும் காய்கறிகள்",
+        "eat-xray-fracture-0": "கால்சியம் நிறைந்த உணவுகள் (பால், சீஸ், தயிர், கீரைகள்)",
+        "eat-xray-fracture-1": "கொலாஜன் உற்பத்திக்கு வைட்டமின் சி நிறைந்த பழங்கள் (ஆரஞ்சு, குடைமிளகாய்)",
+        "eat-xray-fracture-2": "கால்சியம் உறிஞ்சுதலுக்கு வைட்டமின் டி நிறைந்த உணவுகள் (முட்டை, மீன்)",
+        "eat-xray-fracture-3": "எலும்பு மற்றும் தசை பழுதுபார்ப்புக்கு புரதம் நிறைந்த உணவுகள் (பருப்புகள், மீன், சிக்கன்)",
+        "eat-xray-normal-0": "புரதச்சத்து நிறைந்த சமச்சீர் உணவு",
+        "eat-xray-normal-1": "நீரேற்றத்திற்கு போதுமான திரவங்கள் மற்றும் தண்ணீர்",
+        "eat-xray-normal-2": "புதிய பழங்கள் மற்றும் காய்கறிகள்",
+        "noeat-fracture-0": "மதுபானம் (எலும்பு உருவாகும் செல்களை மெதுவாக்கும்)",
+        "noeat-fracture-1": "அதிகப்படியான உப்பு/சோடியம் (சிறுநீரில் கால்சியம் இழப்பை அதிகரிக்கும்)",
+        "noeat-fracture-2": "அதிகப்படியான காஃபின் (கால்சியம் உறிஞ்சுதலைத் தடுக்கும்)",
+        "noeat-fracture-3": "சர்க்கரை மற்றும் பதப்படுத்தப்பட்ட உணவுகள்",
+        "noeat-sprain-0": "பதப்படுத்தப்பட்ட உணவுகள் மற்றும் டிரான்ஸ் கொழுப்புகள் (வீக்கத்தை அதிகரிக்கும்)",
+        "noeat-sprain-1": "அதிகப்படியான சர்க்கரை மற்றும் சர்க்கரை பானங்கள்",
+        "noeat-sprain-2": "மதுபானம் (வீக்கத்தை அதிகரித்து குணமாவதை தாமதப்படுத்தும்)",
+        "noeat-sprain-3": "அதிகப்படியான காஃபின்",
+        "noeat-normal-0": "அதிகப்படியான ஜங்க் உணவுகள்",
+        "noeat-normal-1": "சர்க்கரை பானங்கள்",
+        "noeat-normal-2": "மதுபானம்",
+        "noeat-xray-fracture-0": "மதுபானம் (எலும்பு உருவாகும் செல்களை மெதுவாக்கும்)",
+        "noeat-xray-fracture-1": "அதிகப்படியான உப்பு/சோடியம் (சிறுநீரில் கால்சியம் இழப்பை அதிகரிக்கும்)",
+        "noeat-xray-fracture-2": "அதிகப்படியான காஃபின் (கால்சியம் உறிஞ்சுதலைத் தடுக்கும்)",
+        "noeat-xray-fracture-3": "சர்க்கரை மற்றும் பதப்படுத்தப்பட்ட உணவுகள்",
+        "noeat-xray-normal-0": "அதிகப்படியான ஜங்க் உணவுகள்",
+        "noeat-xray-normal-1": "சர்க்கரை பானங்கள்",
+        "noeat-xray-normal-2": "மதுபானம்"
+    },
+    mr: {
+        "label-medications": "औषधे आणि खबरदारी",
+        "label-eatables": "शिफारस केलेला आहार (खावे)",
+        "label-non-eatables": "टाळावयाचा आहार (खाऊ नये)",
+        "med-fracture": "हाड मोडल्यानंतर वेदनाशामक (NSAIDs) औषधे घेण्यापूर्वी डॉक्टरांचा सल्ला घ्या, कारण यामुळे हाड जुळण्याची प्रक्रिया लांबू शकते. डॉक्टर सहसा पॅरासिटामॉल देतात. हाडांच्या पुनर्बांधणीसाठी कॅल्शियम आणि व्हिटॅमिन डी सप्लिमेंट्स घ्या.",
+        "med-sprain": "लचक आल्यास वेदना व सूज कमी करण्यासाठी आयबुप्रोफेन किंवा पॅरासिटामॉल उपयुक्त ठरतात. नेहमी योग्य डोसचे पालन करा. वेदना दाबून लवकर हालचाल करण्यासाठी यांचा अवाजवी वापर करू नका.",
+        "med-normal": "सौम्य वेदनेसाठी पॅरासिटामॉल घेता येऊ शकते. वेदना सहन करण्यायोग्य असल्यास विनाकारण औषधे घेणे टाळा. वेदना वाढल्यास डॉक्टरांचा सल्ला घ्या.",
+        "med-xray-fracture": "हाड मोडल्यानंतर वेदनाशामक (NSAIDs) औषधे घेण्यापूर्वी डॉक्टरांचा सल्ला घ्या, कारण यामुळे हाड जुळण्याची प्रक्रिया लांबू शकते. डॉक्टर सहसा पॅरासिटामॉल देतात. हाडांच्या पुनर्बांधणीसाठी कॅल्शियम आणि व्हिटॅमिन डी सप्लिमेंट्स घ्या.",
+        "med-xray-normal": "सौम्य वेदनेसाठी पॅरासिटामॉल घेता येऊ शकते. वेदना सहन करण्यायोग्य असल्यास विनाकारण औषधे घेणे टाळा. वेदना वाढल्यास डॉक्टरांचा सल्ला घ्या.",
+        "eat-fracture-0": "कॅल्शियमयुक्त अन्नपदार्थ (दूध, चीज, दही, हिरव्या पालेभाज्या)",
+        "eat-fracture-1": "कोलेजन तयार करण्यासाठी व्हिटॅमिन सी (संत्री, स्ट्रॉबेरी, सिमला मिरची)",
+        "eat-fracture-2": "कॅल्शियम शोषणासाठी व्हिटॅमिन डी (अंडी, मासे, फोर्टिफाइड दुग्धजन्य पदार्थ)",
+        "eat-fracture-3": "प्रथिने (चिकन, मासे, बीन्स, टोफू) स्नायू आणि हाडांच्या दुरुस्तीसाठी",
+        "eat-sprain-0": "सूज कमी करणारे अन्नपदार्थ (बेरी, मासे, अक्रोड, ऑलिव्ह ऑईल)",
+        "eat-sprain-1": "तंतू (ligaments) दुरुस्त करण्यासाठी व्हिटॅमिन सी समृद्ध अन्नपदार्थ",
+        "eat-sprain-2": "लवकर बरे होण्यासाठी झिंकयुक्त पदार्थ (सुका मेवा, बिया, तृणधान्ये)",
+        "eat-sprain-3": "सांधे हायड्रेटेड ठेवण्यासाठी भरपूर पाणी पिणे",
+        "eat-normal-0": "प्रथिनांसह संतुलित आहार",
+        "eat-normal-1": "हायड्रेटिंग द्रवपदार्थ आणि पाणी",
+        "eat-normal-2": "ताजी फळे आणि भाज्या",
+        "eat-xray-fracture-0": "कॅल्शियमयुक्त अन्नपदार्थ (दूध, चीज, दही, हिरव्या पालेभाज्या)",
+        "eat-xray-fracture-1": "कोलेजन तयार करण्यासाठी व्हिटॅमिन सी (संत्री, स्ट्रॉबेरी, सिमला मिरची)",
+        "eat-xray-fracture-2": "कॅल्शियम शोषणासाठी व्हिटॅमिन डी (अंडी, मासे, फोर्टिफाइड दुग्धजन्य पदार्थ)",
+        "eat-xray-fracture-3": "प्रथिने (चिकन, मासे, बीन्स, टोफू) स्नायू आणि हाडांच्या दुरुस्तीसाठी",
+        "eat-xray-normal-0": "प्रथिनांसह संतुलित आहार",
+        "eat-xray-normal-1": "हायड्रेटिंग द्रवपदार्थ आणि पाणी",
+        "eat-xray-normal-2": "ताजी फळे आणि भाज्या",
+        "noeat-fracture-0": "मद्यपान (हाडे तयार करणाऱ्या पेशींची गती मंद करते)",
+        "noeat-fracture-1": "अति मीठ/सोडियम (लघवीद्वारे कॅल्शियमचे उत्सर्जन वाढवते)",
+        "noeat-fracture-2": "अति कॅफिन (कॅल्शियम शोषणात अडथळा आणते)",
+        "noeat-fracture-3": "साखरयुक्त आणि अतिप्रक्रिया केलेले अन्नपदार्थ (processed food)",
+        "noeat-sprain-0": "अतिप्रक्रिया केलेले पदार्थ आणि ट्रान्स फॅट्स (सूज वाढवते)",
+        "noeat-sprain-1": "अति साखर आणि गोड पेये",
+        "noeat-sprain-2": "मद्यपान (सूज वाढवू शकते आणि बरे होण्याची प्रक्रिया मंद करते)",
+        "noeat-sprain-3": "अति कॅफिन",
+        "noeat-normal-0": "अति जंक फूड",
+        "noeat-normal-1": "गोड पेये",
+        "noeat-normal-2": "मद्यपान",
+        "noeat-xray-fracture-0": "मद्यपान (हाडे तयार करणाऱ्या पेशींची गती मंद करते)",
+        "noeat-xray-fracture-1": "अति मीठ/सोडियम (लघवीद्वारे कॅल्शियमचे उत्सर्जन वाढवते)",
+        "noeat-xray-fracture-2": "अति कॅफिन (कॅल्शियम शोषणात अडथळा आणते)",
+        "noeat-xray-fracture-3": "साखरयुक्त आणि अतिप्रक्रिया केलेले अन्नपदार्थ (processed food)",
+        "noeat-xray-normal-0": "अति जंक फूड",
+        "noeat-xray-normal-1": "गोड पेये",
+        "noeat-xray-normal-2": "मद्यपान"
+    }
 };
 

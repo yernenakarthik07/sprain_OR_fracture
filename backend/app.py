@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from model.predict import predict_injury
+from model.predict import predict_injury, MEDICATIONS_PRECAUTIONS, DIET_EATABLE, DIET_NON_EATABLE
 
 app = Flask(__name__)
 
@@ -319,7 +319,10 @@ def predict_xray():
             "severity": severity,
             "care_steps": care_steps,
             "when_to_seek_help": when_to_seek_help,
-            "differential": differential
+            "differential": differential,
+            "medications_precautions": MEDICATIONS_PRECAUTIONS.get(diagnosis, ""),
+            "diet_eatable": DIET_EATABLE.get(diagnosis, []),
+            "diet_non_eatable": DIET_NON_EATABLE.get(diagnosis, [])
         }), 200
         
     except Exception as e:

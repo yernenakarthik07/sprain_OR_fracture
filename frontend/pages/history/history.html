@@ -135,6 +135,39 @@
                     </div>
                 </div>
 
+                <!-- Medications & Precautions -->
+                <div id="modal-medications-container" class="hidden">
+                    <h4 class="font-label-md text-label-md text-on-surface mb-2" data-i18n="label-medications">Medications & Precautions</h4>
+                    <div id="modal-medications-text" class="bg-primary/5 p-4 rounded-xl border border-primary/20 font-body-sm text-body-sm text-on-surface-variant whitespace-pre-line">
+                        -
+                    </div>
+                </div>
+
+                <!-- Diet Recommendation (Recovery) -->
+                <div id="modal-diet-container" class="hidden">
+                    <h4 class="font-label-md text-label-md text-on-surface mb-3" data-i18n="label-diet-recommendations">Dietary Guide (Recovery)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div id="modal-diet-eatable-container" class="bg-primary-container/20 p-4 rounded-xl border border-primary/10">
+                            <p class="font-label-sm text-label-sm text-primary mb-2 flex items-center gap-1 font-bold">
+                                <span class="material-symbols-outlined text-[18px]">restaurant</span>
+                                <span data-i18n="label-eatables">Recommended Diet (Eatable)</span>
+                            </p>
+                            <ul id="modal-diet-eatable-list" class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant pl-2">
+                                <!-- Eatable items -->
+                            </ul>
+                        </div>
+                        <div id="modal-diet-non-eatable-container" class="bg-error-container/20 p-4 rounded-xl border border-error/10">
+                            <p class="font-label-sm text-label-sm text-error mb-2 flex items-center gap-1 font-bold">
+                                <span class="material-symbols-outlined text-[18px]">no_meals</span>
+                                <span data-i18n="label-non-eatables">Diet Restrictions (Non-Eatable)</span>
+                            </p>
+                            <ul id="modal-diet-non-eatable-list" class="space-y-1.5 font-body-sm text-body-sm text-on-surface-variant pl-2">
+                                <!-- Non-eatable items -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Care Steps -->
                 <div id="modal-care-steps-container" class="hidden">
                     <h4 class="font-label-md text-label-md text-on-surface mb-2" data-i18n="label-care-steps">Care Steps</h4>
