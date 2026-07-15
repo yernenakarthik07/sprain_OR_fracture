@@ -211,7 +211,7 @@ function initSpeechRecognition() {
         stopListening();
         const inputEl = document.getElementById('chat-input');
         if (inputEl && inputEl.value.trim().length > 0) {
-            sendMessage();
+            inputEl.focus();
         }
     };
 }
