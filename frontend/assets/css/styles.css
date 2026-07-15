@@ -1,24 +1,135 @@
+/* Smooth global theme transition */
+html, body, nav, footer, main, section, div, button, input, select, textarea, .card {
+    transition: background-color 250ms ease-in-out, border-color 250ms ease-in-out, color 250ms ease-in-out, box-shadow 250ms ease-in-out;
+}
+
+/* Pure OLED Black Dark Theme Overrides */
+html.dark,
+html.dark body,
+html.dark main,
+html.dark section,
+html.dark div.bg-background,
+html.dark div.bg-surface,
+html.dark div.bg-surface-bright,
+html.dark div.bg-surface-container-low,
+html.dark div.bg-surface-container-lowest {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* Pure Black Navigation Bar */
+html.dark nav {
+    background-color: rgba(0, 0, 0, 0.95) !important;
+    border-color: #222222 !important;
+}
+
+/* OLED Black Cards & Containers */
+html.dark .bg-surface-container-lowest,
+html.dark .bg-surface-container-low,
+html.dark .bg-surface-container-high,
+html.dark .bg-surface-container,
+html.dark .bg-surface-bright,
+html.dark .bg-surface-container-highest,
+html.dark footer {
+    background-color: #0a0a0a !important;
+    border-color: #222222 !important;
+    color: #ffffff !important;
+}
+
+/* Text Colors in Dark Mode */
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6, html.dark strong {
+    color: #ffffff !important;
+}
+
+html.dark p, 
+html.dark span:not(.text-primary):not(.text-error):not(.text-secondary):not(.text-success), 
+html.dark label,
+html.dark .text-on-surface-variant,
+html.dark .text-on-surface {
+    color: #d1d5db !important;
+}
+
+html.dark a:not(.bg-primary):not(.bg-primary-container) {
+    color: #e5e7eb;
+}
+
+html.dark a:hover {
+    color: #10b981 !important;
+}
+
+/* Dark Mode Inputs & Controls */
+html.dark input, 
+html.dark select, 
+html.dark textarea {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+    border-color: #333333 !important;
+}
+
+html.dark select option {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+}
+
+/* Medical background pattern in True Black mode */
 .medical-pattern {
     background-image: radial-gradient(#bec9c1 1px, transparent 1px);
     background-size: 24px 24px;
+}
+
+html.dark .medical-pattern {
+    background-image: radial-gradient(#333333 1px, transparent 1px);
+}
+
+/* Floating animation for hero graphics / feature cards */
+@keyframes floatSlow {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+    animation: floatSlow 4s ease-in-out infinite;
+}
+
+/* Pulse glow for status / interactive badges */
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
+}
+
+.animate-glow {
+    animation: pulseGlow 3s infinite ease-in-out;
+}
+
+/* Interactive hover micro-animations */
+.hover-lift {
+    transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 250ms ease;
+}
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15);
+}
+
+html.dark .hover-lift:hover {
+    box-shadow: 0 12px 24px -10px rgba(16, 185, 129, 0.25);
 }
 
 /* Animation System 1: Scroll Fade-In */
 @media (prefers-reduced-motion: no-preference) {
     .reveal {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(20px);
+        transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+                    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
     }
     @media (min-width: 768px) {
         .reveal {
-            transform: translateY(30px);
+            transform: translateY(35px);
         }
     }
     .reveal.active {
         opacity: 1;
         transform: translateY(0);
-        transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
-                    transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
     }
     
     /* Staggering children */

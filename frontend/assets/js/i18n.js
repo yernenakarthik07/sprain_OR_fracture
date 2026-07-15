@@ -664,7 +664,7 @@ window.applyTranslations = function() {
             if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
                 element.setAttribute('placeholder', translation);
             } else {
-                element.textContent = translation;
+                element.innerHTML = translation;
             }
         }
     });
@@ -688,12 +688,35 @@ window.setLanguage = function(lang) {
     window.dispatchEvent(event);
 };
 
-// Initialize translation switcher element
+// Theme Management System (Dark / Light Mode)
+window.initTheme = function() {
+    const savedTheme = localStorage.getItem('theme');
+    const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (isDark) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+};
+
+window.toggleTheme = function() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    const icon = document.getElementById('global-theme-icon');
+    if (icon) {
+        icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    }
+};
+
+// Run theme init immediately to prevent theme flicker
+window.initTheme();
+
+// Initialize translation & theme switcher element in navbar
 window.createLanguageSwitcher = function() {
     const navbar = document.querySelector('nav .flex.justify-between.items-center');
     if (!navbar) return;
     
-    // Check if switcher already exists
+    // Check if switcher container already exists
     if (document.getElementById('language-switcher-container')) return;
 
     const languages = [
@@ -706,7 +729,7 @@ window.createLanguageSwitcher = function() {
 
     const container = document.createElement('div');
     container.id = 'language-switcher-container';
-    container.className = 'relative inline-block text-left mr-2';
+    container.className = 'relative flex items-center gap-2 text-left mr-2';
 
     let optionsHtml = '';
     languages.forEach(lang => {
@@ -717,6 +740,8 @@ window.createLanguageSwitcher = function() {
         `;
     });
 
+    const isCurrentlyDark = document.documentElement.classList.contains('dark');
+
     container.innerHTML = `
         <select 
             onchange="window.setLanguage(this.value)" 
@@ -725,6 +750,16 @@ window.createLanguageSwitcher = function() {
         >
             ${optionsHtml}
         </select>
+        <button 
+            type="button"
+            onclick="window.toggleTheme()" 
+            class="p-2 rounded-lg bg-surface-container-high border border-outline-variant text-on-surface hover:bg-surface-container transition-all flex items-center justify-center cursor-pointer shadow-sm"
+            id="global-theme-toggle"
+            title="Toggle Dark / Light Mode"
+            aria-label="Toggle Theme"
+        >
+            <span class="material-symbols-outlined text-[20px]" id="global-theme-icon">${isCurrentlyDark ? 'light_mode' : 'dark_mode'}</span>
+        </button>
     `;
 
     // Insert switcher before the How It Works link container (nav links)
@@ -740,6 +775,7 @@ window.createLanguageSwitcher = function() {
 
 // Run automatically on load
 document.addEventListener('DOMContentLoaded', () => {
+    window.initTheme();
     if (window.staticTranslations) {
         Object.keys(window.staticTranslations).forEach(lang => {
             if (window.translations[lang]) {
