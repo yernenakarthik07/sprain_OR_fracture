@@ -1,6 +1,9 @@
 [build]
   publish = "."
 
+[build.environment]
+  PYTHON_VERSION = "3.11.8"
+
 [[redirects]]
   from = "/api/predict-xray"
   to = "https://csp-project-f6aq.onrender.com/api/predict-xray"
