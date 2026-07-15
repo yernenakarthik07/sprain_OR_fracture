@@ -1,0 +1,17 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/api/predict-xray"
+  to = "https://csp-project-f6aq.onrender.com/api/predict-xray"
+  status = 200
+
+[[redirects]]
+  from = "/api/diagnose"
+  to = "https://csp-project-f6aq.onrender.com/api/diagnose"
+  status = 200
+
+[[redirects]]
+  from = "/"
+  to = "/frontend/index.html"
+  status = 200
