@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "framework": null,
+  "buildCommand": "echo 'Build completed!'",
   "rewrites": [
     {
       "source": "/api/predict-xray",
