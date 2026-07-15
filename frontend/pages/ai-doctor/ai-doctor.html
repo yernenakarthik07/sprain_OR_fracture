@@ -131,10 +131,10 @@
                         <div class="flex-1">
                             <div class="bg-surface-container-high p-4 rounded-2xl rounded-tl-none max-w-md">
                                 <p class="font-body-md text-body-md text-on-surface">
-                                    Hello! I'm Dr. AI, your virtual health assistant powered by Groq Llama 3 & Whisper. 👋
+                                    Hello! I'm Dr. AI, your virtual health assistant powered by Groq Llama 3. 👋
                                 </p>
                                 <p class="font-body-md text-body-md text-on-surface mt-2">
-                                    I will speak & answer in your preferred language! You can speak or type your question:
+                                    I will speak & answer in your preferred language! I can help with:
                                 </p>
                                 <ul class="mt-2 space-y-1 font-body-sm text-body-sm text-on-surface-variant">
                                     <li>• Injury assessment and symptoms</li>
@@ -143,7 +143,7 @@
                                     <li>• When to seek emergency care</li>
                                 </ul>
                                 <p class="font-body-sm text-body-sm text-on-surface-variant mt-3 italic">
-                                    💡 Click 🎙️ below to speak in your language, or select your language in the top right header!
+                                    💡 Type your health question below, or select your preferred language in the top right header!
                                 </p>
                             </div>
                             <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 ml-2">Just now</p>
@@ -172,18 +172,11 @@
 
                 <!-- Chat Input -->
                 <div class="p-4 border-t border-outline-variant/30 bg-surface">
-                    <div id="mic-status-badge" class="hidden mb-2 px-3 py-1 bg-red-100 dark:bg-red-950/80 border border-red-300 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 font-label-sm text-label-sm items-center gap-2 animate-pulse">
-                        <span class="w-2.5 h-2.5 bg-red-600 rounded-full animate-ping"></span>
-                        <span id="mic-status-text">Listening... Speak now into your microphone.</span>
-                    </div>
                     <div class="flex gap-2 items-center">
-                        <button id="mic-btn" onclick="toggleVoiceInput()" title="Speak your question (Voice Assistant)" class="p-3 rounded-xl bg-surface-container-high hover:bg-surface-container text-on-surface transition-all flex items-center justify-center border border-outline-variant">
-                            <span class="material-symbols-outlined text-2xl" id="mic-icon">mic</span>
-                        </button>
                         <input 
                             type="text" 
                             id="chat-input" 
-                            placeholder="Type or click 🎙️ to speak your health question..." 
+                            placeholder="Type your health question..." 
                             class="flex-1 px-4 py-3 rounded-xl border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-body-md text-body-md"
                             onkeypress="handleKeyPress(event)"
                             oninput="stopCurrentSpeech()"
