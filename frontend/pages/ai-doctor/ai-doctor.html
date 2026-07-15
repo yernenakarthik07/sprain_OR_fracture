@@ -79,24 +79,46 @@
             <!-- Chat Container -->
             <div class="flex-1 flex flex-col bg-surface-container-lowest rounded-3xl shadow-elevated border border-outline-variant/30 overflow-hidden" style="height: 700px;">
                 <!-- Chat Header -->
-                <div class="bg-primary-container p-4 flex items-center gap-3 border-b border-outline-variant/30">
-                    <div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-3xl">
-                        👨‍⚕️
+                <div class="bg-primary-container p-4 flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/30">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center text-3xl shrink-0">
+                            👨‍⚕️
+                        </div>
+                        <div>
+                            <p class="font-headline-sm text-headline-sm text-on-primary">Dr. AI Assistant</p>
+                            <p class="font-body-sm text-body-sm text-on-primary/80 flex items-center gap-1" id="voice-status-indicator">
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                <span id="voice-status-text">Online - Groq Llama 3 Active</span>
+                            </p>
+                        </div>
                     </div>
-                    <div class="flex-1">
-                        <p class="font-headline-sm text-headline-sm text-on-primary">Dr. AI Assistant</p>
-                        <p class="font-body-sm text-body-sm text-on-primary/80 flex items-center gap-1" id="voice-status-indicator">
-                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                            <span>Online - Groq Llama 3 & Voice Active</span>
-                        </p>
+
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Spoken Language Selector -->
+                        <div class="flex items-center gap-1 bg-surface-container-lowest/15 px-2 py-1 rounded-lg border border-on-primary/20">
+                            <span class="material-symbols-outlined text-on-primary text-[18px]">translate</span>
+                            <select 
+                                id="voice-lang-select" 
+                                onchange="onVoiceLangChange(this.value)"
+                                class="bg-transparent text-on-primary font-label-sm text-label-sm focus:outline-none cursor-pointer border-none p-0 pr-1"
+                                title="Select Spoken & Response Language"
+                            >
+                                <option value="en-US" class="text-on-surface bg-surface">English 🇬🇧</option>
+                                <option value="hi-IN" class="text-on-surface bg-surface">हिंदी (Hindi) 🇮🇳</option>
+                                <option value="te-IN" class="text-on-surface bg-surface">తెలుగు (Telugu) 🇮🇳</option>
+                                <option value="ta-IN" class="text-on-surface bg-surface">தமிழ் (Tamil) 🇮🇳</option>
+                                <option value="mr-IN" class="text-on-surface bg-surface">मराठी (Marathi) 🇮🇳</option>
+                            </select>
+                        </div>
+
+                        <button id="voice-toggle-btn" onclick="toggleVoiceOutput()" title="Toggle Voice Response" class="text-on-primary hover:bg-surface-container/20 p-2 rounded-lg transition-colors flex items-center gap-1 text-sm font-medium">
+                            <span class="material-symbols-outlined" id="voice-toggle-icon">volume_up</span>
+                            <span id="voice-toggle-text">Voice On</span>
+                        </button>
+                        <button onclick="clearChat()" title="Clear Chat History" class="text-on-primary hover:bg-surface-container/20 p-2 rounded-lg transition-colors">
+                            <span class="material-symbols-outlined">delete_sweep</span>
+                        </button>
                     </div>
-                    <button id="voice-toggle-btn" onclick="toggleVoiceOutput()" title="Toggle Voice Response" class="text-on-primary hover:bg-surface-container/20 p-2 rounded-lg transition-colors flex items-center gap-1 text-sm font-medium">
-                        <span class="material-symbols-outlined" id="voice-toggle-icon">volume_up</span>
-                        <span id="voice-toggle-text">Voice On</span>
-                    </button>
-                    <button onclick="clearChat()" title="Clear Chat History" class="text-on-primary hover:bg-surface-container/20 p-2 rounded-lg transition-colors">
-                        <span class="material-symbols-outlined">delete_sweep</span>
-                    </button>
                 </div>
 
                 <!-- Chat Messages -->
@@ -112,17 +134,16 @@
                                     Hello! I'm Dr. AI, your virtual health assistant powered by Groq Llama 3 & Whisper. 👋
                                 </p>
                                 <p class="font-body-md text-body-md text-on-surface mt-2">
-                                    You can speak or type your question! I can help with:
+                                    I will speak & answer in your preferred language! You can speak or type your question:
                                 </p>
                                 <ul class="mt-2 space-y-1 font-body-sm text-body-sm text-on-surface-variant">
                                     <li>• Injury assessment and symptoms</li>
                                     <li>• Fractures vs sprains identification</li>
                                     <li>• First aid and treatment advice</li>
                                     <li>• When to seek emergency care</li>
-                                    <li>• General health questions</li>
                                 </ul>
                                 <p class="font-body-sm text-body-sm text-on-surface-variant mt-3 italic">
-                                    💡 Click the microphone icon below to speak to me, or type your question!
+                                    💡 Click 🎙️ below to speak in your language, or select your language in the top right header!
                                 </p>
                             </div>
                             <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 ml-2">Just now</p>
@@ -151,6 +172,10 @@
 
                 <!-- Chat Input -->
                 <div class="p-4 border-t border-outline-variant/30 bg-surface">
+                    <div id="mic-status-badge" class="hidden mb-2 px-3 py-1 bg-red-100 dark:bg-red-950/80 border border-red-300 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 font-label-sm text-label-sm items-center gap-2 animate-pulse">
+                        <span class="w-2.5 h-2.5 bg-red-600 rounded-full animate-ping"></span>
+                        <span id="mic-status-text">Listening... Speak now into your microphone.</span>
+                    </div>
                     <div class="flex gap-2 items-center">
                         <button id="mic-btn" onclick="toggleVoiceInput()" title="Speak your question (Voice Assistant)" class="p-3 rounded-xl bg-surface-container-high hover:bg-surface-container text-on-surface transition-all flex items-center justify-center border border-outline-variant">
                             <span class="material-symbols-outlined text-2xl" id="mic-icon">mic</span>
@@ -163,6 +188,10 @@
                             onkeypress="handleKeyPress(event)"
                             oninput="stopCurrentSpeech()"
                         />
+                        <button onclick="sendMessage()" class="bg-primary-container text-on-primary px-6 py-3 rounded-xl font-label-md text-label-md hover:bg-surface-tint transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
                         <button onclick="sendMessage()" class="bg-primary-container text-on-primary px-6 py-3 rounded-xl font-label-md text-label-md hover:bg-surface-tint transition-all flex items-center gap-2">
                             <span class="material-symbols-outlined">send</span>
                         </button>

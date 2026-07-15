@@ -1,4 +1,4 @@
-// Groq API & Speech Assistant Configuration
+// Groq API & Multilingual Speech Assistant Configuration
 // -----------------------------------------------------------
 const GROQ_API_KEY_LOCAL = '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';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
@@ -8,36 +8,85 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 let isVoiceOutputEnabled = true;
 let isListening = false;
 let recognition = null;
+let selectedVoiceLang = 'en-US'; // Default
 
-// System prompt to make Llama 3 act as a professional medical assistant
-const SYSTEM_PROMPT = `You are Dr. AI, a professional, empathetic medical assistant specializing in injury assessment, fractures, sprains, and general health advice.
+const langNameMap = {
+    'en-US': 'English',
+    'hi-IN': 'Hindi (हिंदी)',
+    'te-IN': 'Telugu (తెలుగు)',
+    'ta-IN': 'Tamil (தமிழ்)',
+    'mr-IN': 'Marathi (मराठी)'
+};
+
+// Base system prompt
+const BASE_SYSTEM_PROMPT = `You are Dr. AI, a professional, empathetic medical assistant specializing in injury assessment, fractures, sprains, and general health advice.
 
 IMPORTANT RULES:
 1. ONLY answer questions related to health, medical conditions, injuries, symptoms, and wellness.
-2. If asked about non-medical topics (politics, entertainment, technology, etc.), politely redirect: "I'm a medical assistant and can only help with health-related questions. Do you have any concerns about injuries, pain, or your health?"
+2. If asked about non-medical topics (politics, entertainment, technology, etc.), politely redirect in the requested language.
 3. Always provide accurate, helpful medical information concisely.
 4. Use a warm, empathetic, professional tone.
 5. Remind users to seek professional medical care or emergency services for serious conditions.
 6. Never provide specific medication dosages - always advise consulting a qualified doctor.
-
-Keep responses conversational, concise, clear, and easy to speak out loud.`;
+7. Keep responses concise, clear, and easy to speak out loud.`;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     rotateHealthContent();
     setInterval(rotateHealthContent, 30000);
     initRevealAnimations();
+    syncInitialLanguage();
     initSpeechRecognition();
 });
+
+// Sync initial language selection with global site language or stored preference
+function syncInitialLanguage() {
+    const siteLang = window.currentLanguage || localStorage.getItem('selectedLanguage') || 'en';
+    const langCodeMap = {
+        'en': 'en-US',
+        'hi': 'hi-IN',
+        'te': 'te-IN',
+        'ta': 'ta-IN',
+        'mr': 'mr-IN'
+    };
+    
+    if (langCodeMap[siteLang]) {
+        selectedVoiceLang = langCodeMap[siteLang];
+    }
+    
+    const selectEl = document.getElementById('voice-lang-select');
+    if (selectEl) {
+        selectEl.value = selectedVoiceLang;
+    }
+}
+
+// User changed preferred language from dropdown
+function onVoiceLangChange(langCode) {
+    selectedVoiceLang = langCode;
+    stopCurrentSpeech();
+    
+    if (recognition) {
+        recognition.lang = selectedVoiceLang;
+    }
+    
+    const langName = langNameMap[selectedVoiceLang] || selectedVoiceLang;
+    console.log(`[Voice Assistant] Language changed to: ${langName} (${selectedVoiceLang})`);
+}
+
+// Generate system prompt with language instruction
+function getSystemPromptForLanguage() {
+    const langName = langNameMap[selectedVoiceLang] || 'English';
+    return `${BASE_SYSTEM_PROMPT}\n\nCRITICAL LANGUAGE INSTRUCTION: You MUST write your entire response natively in ${langName}. Do not respond in English unless the requested language is English.`;
+}
 
 // Rotate health quotes and facts
 function rotateHealthContent() {
     const healthQuotes = [
-        "An apple a day keeps the doctor away, but if the doctor is cute, forget the fruit! 🍎",
+        "An apple a day keeps the doctor away! 🍎",
         "Health is not valued until sickness comes. - Thomas Fuller 💪",
         "Take care of your body. It's the only place you have to live. - Jim Rohn 🏃",
         "The greatest wealth is health. - Virgil 💎",
-        "Movement is medicine. Get active today! 🚴",
+        "Movement is medicine. Stay active! 🚴",
         "Drink water like it's your job! Stay hydrated! 💧"
     ];
     const healthFacts = [
@@ -88,13 +137,13 @@ function stopCurrentSpeech() {
     }
 }
 
-// Text-to-Speech (TTS) Doctor Voice Output
+// Text-to-Speech (TTS) Doctor Voice Output in Preferred Regional Language
 function speakDoctorResponse(text) {
     if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
 
     stopCurrentSpeech();
 
-    // Clean text: strip emojis, bullets, and markdown for smooth voice reading
+    // Clean text: strip emojis, bullets, and markdown for smooth regional voice reading
     let cleanText = text
         .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
         .replace(/[*#_•`]/g, ' ')
@@ -104,16 +153,19 @@ function speakDoctorResponse(text) {
     if (!cleanText) return;
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = selectedVoiceLang;
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
 
-    // Pick warm English natural voice
+    // Pick regional matching voice if available
     const voices = window.speechSynthesis.getVoices();
-    const englishVoice = voices.find(v => (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('Karen')) && v.lang.startsWith('en'))
+    const targetLangPrefix = selectedVoiceLang.split('-')[0]; // 'hi', 'te', 'ta', 'mr', 'en'
+    
+    const matchedVoice = voices.find(v => v.lang === selectedVoiceLang || v.lang.startsWith(targetLangPrefix))
         || voices.find(v => v.lang.startsWith('en'));
 
-    if (englishVoice) {
-        utterance.voice = englishVoice;
+    if (matchedVoice) {
+        utterance.voice = matchedVoice;
     }
 
     window.speechSynthesis.speak(utterance);
@@ -123,14 +175,14 @@ function speakDoctorResponse(text) {
 function initSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        console.warn('Speech Recognition API not supported in this browser.');
+        console.warn('Web Speech Recognition API not supported natively in this browser.');
         return;
     }
 
     recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = true;
-    recognition.lang = 'en-US';
+    recognition.lang = selectedVoiceLang;
 
     recognition.onstart = () => {
         isListening = true;
@@ -149,6 +201,9 @@ function initSpeechRecognition() {
 
     recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
+        if (event.error === 'not-allowed') {
+            alert('Microphone access was denied. Please allow microphone permissions in your browser address bar to use Voice Mode.');
+        }
         stopListening();
     };
 
@@ -161,25 +216,41 @@ function initSpeechRecognition() {
     };
 }
 
-// Toggle Voice Listening State
-function toggleVoiceInput() {
-    if (!recognition) {
-        alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
-        return;
-    }
-
+// Toggle Voice Listening State with explicit Media Permission check
+async function toggleVoiceInput() {
     stopCurrentSpeech();
 
     if (isListening) {
-        recognition.stop();
+        if (recognition) recognition.stop();
         stopListening();
-    } else {
+        return;
+    }
+
+    // Request browser mic permission explicitly first if needed
+    try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+    } catch (err) {
+        console.error('Microphone permission error:', err);
+        alert('Microphone access is required for Voice Assistant. Please enable microphone permissions in your browser bar.');
+        return;
+    }
+
+    if (!recognition) {
+        initSpeechRecognition();
+    }
+
+    if (recognition) {
         try {
+            recognition.lang = selectedVoiceLang;
             recognition.start();
         } catch (e) {
             console.error('Recognition start error:', e);
             stopListening();
         }
+    } else {
+        alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
     }
 }
 
@@ -191,16 +262,23 @@ function stopListening() {
 function updateMicUI(listening) {
     const micIcon = document.getElementById('mic-icon');
     const micBtn = document.getElementById('mic-btn');
+    const badge = document.getElementById('mic-status-badge');
+    const statusText = document.getElementById('mic-status-text');
+
+    const langName = langNameMap[selectedVoiceLang] || 'English';
 
     if (micIcon && micBtn) {
         if (listening) {
             micIcon.textContent = 'mic';
             micIcon.className = 'material-symbols-outlined text-2xl text-red-500 animate-pulse';
             micBtn.className = 'p-3 rounded-xl bg-red-100 dark:bg-red-900/40 border border-red-500 text-red-500 transition-all flex items-center justify-center';
+            if (badge) badge.classList.remove('hidden');
+            if (statusText) statusText.textContent = `Listening in ${langName}... Speak now into your microphone.`;
         } else {
             micIcon.textContent = 'mic';
             micIcon.className = 'material-symbols-outlined text-2xl text-on-surface';
             micBtn.className = 'p-3 rounded-xl bg-surface-container-high hover:bg-surface-container text-on-surface transition-all flex items-center justify-center border border-outline-variant';
+            if (badge) badge.classList.add('hidden');
         }
     }
 }
@@ -222,7 +300,7 @@ async function sendMessage() {
     showTypingIndicator();
 
     try {
-        console.log('Sending message to Groq Llama 3 AI...');
+        console.log(`Sending message to Groq Llama 3 AI in ${selectedVoiceLang}...`);
         const responseText = await getGroqResponse(message);
         hideTypingIndicator();
         addMessage(responseText, 'ai');
@@ -236,8 +314,10 @@ async function sendMessage() {
     }
 }
 
-// Call Groq API with Llama 3 model
+// Call Groq API with Llama 3 model in preferred language
 async function getGroqResponse(userMessage) {
+    const systemPrompt = getSystemPromptForLanguage();
+
     try {
         const response = await fetch(GROQ_API_URL, {
             method: 'POST',
@@ -248,7 +328,7 @@ async function getGroqResponse(userMessage) {
             body: JSON.stringify({
                 model: GROQ_MODEL,
                 messages: [
-                    { role: 'system', content: SYSTEM_PROMPT },
+                    { role: 'system', content: systemPrompt },
                     { role: 'user', content: userMessage }
                 ],
                 temperature: 0.5,
@@ -262,7 +342,7 @@ async function getGroqResponse(userMessage) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    system_prompt: SYSTEM_PROMPT,
+                    system_prompt: systemPrompt,
                     message: userMessage
                 })
             });
@@ -285,7 +365,7 @@ async function getGroqResponse(userMessage) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                system_prompt: SYSTEM_PROMPT,
+                system_prompt: systemPrompt,
                 message: userMessage
             })
         });
@@ -443,7 +523,7 @@ function clearChat() {
                         Hello! I'm Dr. AI, your virtual health assistant powered by Groq Llama 3 & Whisper. 👋
                     </p>
                     <p class="font-body-md text-body-md text-on-surface mt-2">
-                        You can speak or type your question!
+                        You can speak or type your question in your preferred language!
                     </p>
                 </div>
                 <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 ml-2">Just now</p>
