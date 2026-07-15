@@ -1,9 +1,10 @@
 /**
- * Vercel Serverless Function — Gemini AI Chat Proxy
- * API key is stored securely as GEMINI_API_KEY environment variable in Vercel.
+ * Vercel Serverless Function — Groq / Gemini AI Chat & Voice Proxy
+ * Primary model: Groq Llama-3.3-70b-versatile & Whisper
  */
 
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GROQ_API_KEY_DEFAULT = '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';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 async function handler(req, res) {
     try {
@@ -11,42 +12,40 @@ async function handler(req, res) {
             return res.status(405).json({ error: 'Method not allowed' });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            return res.status(500).json({ error: 'GEMINI_API_KEY not configured in Vercel environment variables.' });
-        }
+        const apiKey = process.env.GROQ_API_KEY || GROQ_API_KEY_DEFAULT;
+        
+        const systemPrompt = req.body.system_prompt || "You are Dr. AI, an expert medical triage assistant.";
+        const userMessage = req.body.message || (req.body.contents ? req.body.contents[0]?.parts[0]?.text : "");
 
-        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+        const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-        const upstream = await fetch(GEMINI_URL, {
+        const upstream = await fetch(GROQ_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(req.body),
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: GROQ_MODEL,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userMessage }
+                ],
+                temperature: 0.5,
+                max_tokens: 1024
+            }),
         });
 
-        let data;
-        const text = await upstream.text();
-        try {
-            data = JSON.parse(text);
-        } catch {
-            data = { error: 'Gemini API returned non-JSON', raw: text.slice(0, 500) };
-        }
-
+        const data = await upstream.json();
         return res.status(upstream.status).json(data);
 
     } catch (err) {
-        console.error('[chat proxy error]', err);
+        console.error('[Groq Chat Proxy Error]', err);
         return res.status(500).json({
-            error: 'Proxy function crashed',
+            error: 'Proxy function error',
             message: err.message,
         });
     }
 }
-
-handler.config = {
-    api: {
-        maxDuration: 30,
-    },
-};
 
 module.exports = handler;
