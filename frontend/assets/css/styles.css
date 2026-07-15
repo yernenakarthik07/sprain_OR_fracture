@@ -3,7 +3,39 @@ html, body, nav, footer, main, section, div, button, input, select, textarea, .c
     transition: background-color 250ms ease-in-out, border-color 250ms ease-in-out, color 250ms ease-in-out, box-shadow 250ms ease-in-out;
 }
 
+/* Base Light Mode Text & Background Guarantee */
+html:not(.dark) {
+    background-color: #fbf8ff;
+    color: #151a31;
+}
+
+html:not(.dark) h1, 
+html:not(.dark) h2, 
+html:not(.dark) h3, 
+html:not(.dark) h4, 
+html:not(.dark) h5, 
+html:not(.dark) h6 {
+    color: #151a31 !important;
+}
+
+html:not(.dark) p, 
+html:not(.dark) .text-on-surface-variant {
+    color: #3f4943 !important;
+}
+
+html:not(.dark) .bg-surface-container-lowest {
+    background-color: #ffffff !important;
+    color: #151a31 !important;
+}
+
 /* Pure OLED Black Dark Theme Overrides */
+html.dark {
+    color-scheme: dark;
+    --tw-gradient-from: #000000 !important;
+    --tw-gradient-to: #0a0a0a !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
 html.dark,
 html.dark body,
 html.dark main,
@@ -12,7 +44,12 @@ html.dark div.bg-background,
 html.dark div.bg-surface,
 html.dark div.bg-surface-bright,
 html.dark div.bg-surface-container-low,
-html.dark div.bg-surface-container-lowest {
+html.dark div.bg-surface-container-lowest,
+html.dark .bg-gradient-to-br,
+html.dark .bg-gradient-to-r,
+html.dark .bg-gradient-to-t,
+html.dark .bg-gradient-to-l {
+    background-image: none !important;
     background-color: #000000 !important;
     color: #ffffff !important;
 }
@@ -31,8 +68,8 @@ html.dark .bg-surface-container,
 html.dark .bg-surface-bright,
 html.dark .bg-surface-container-highest,
 html.dark footer {
-    background-color: #0a0a0a !important;
-    border-color: #222222 !important;
+    background-color: #0d0d0d !important;
+    border-color: #262626 !important;
     color: #ffffff !important;
 }
 
@@ -49,7 +86,7 @@ html.dark .text-on-surface {
     color: #d1d5db !important;
 }
 
-html.dark a:not(.bg-primary):not(.bg-primary-container) {
+html.dark a:not(.bg-primary):not(.bg-primary-container):not(.btn) {
     color: #e5e7eb;
 }
 
@@ -71,14 +108,14 @@ html.dark select option {
     color: #ffffff !important;
 }
 
-/* Medical background pattern in True Black mode */
+/* Medical background pattern in Light and True Black modes */
 .medical-pattern {
     background-image: radial-gradient(#bec9c1 1px, transparent 1px);
     background-size: 24px 24px;
 }
 
 html.dark .medical-pattern {
-    background-image: radial-gradient(#333333 1px, transparent 1px);
+    background-image: radial-gradient(#333333 1px, transparent 1px) !important;
 }
 
 /* Floating animation for hero graphics / feature cards */
