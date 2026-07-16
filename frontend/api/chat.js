@@ -1,6 +1,6 @@
 // Ee serverless proxy function Doctor health assistant chat requests ni process chesthundi
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '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';
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const MODEL_NAME = 'llama-3.3-70b-versatile';
 
 export default async function handler(req, res) {
