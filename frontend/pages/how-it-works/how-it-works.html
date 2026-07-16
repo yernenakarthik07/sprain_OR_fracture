@@ -15,41 +15,39 @@
 <body class="bg-background text-on-surface font-body-md antialiased overflow-x-hidden">
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 bg-surface/95 dark:bg-surface/95 backdrop-blur-md border-b border-outline-variant/30 dark:border-outline/20 shadow-sm dark:shadow-none">
-<div class="flex justify-between items-center h-16 px-margin-desktop max-w-container-max mx-auto">
-<a class="flex items-center gap-2 font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed" data-i18n="how-it-works-a-32" href="../../index.html">
+<div class="flex justify-between items-center h-16 px-4 md:px-8 max-w-[1400px] mx-auto gap-3">
+<a class="flex items-center gap-2 font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed shrink-0" href="../../index.html">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
-<span data-i18n="how-it-works-span-30">FractureOrSprain?</span>
+<span class="whitespace-nowrap">FractureOrSprain?</span>
 </a>
-<div class="hidden md:flex gap-gutter items-center font-label-md text-label-md" data-i18n="how-it-works-div-39">
-<a class="text-primary dark:text-primary-fixed border-b-2 border-primary pb-1" data-i18n="nav-how-it-works" href="how-it-works.html">How It Works</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-assessment" href="../../index.html#assessment">Assessment</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-examples" href="../../index.html#case-studies">Example Scenarios</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-ai-doctor" href="../ai-doctor/ai-doctor.html">AI Doctor</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-history" href="../history/history.html">History</a>
+<div class="hidden lg:flex gap-6 items-center font-label-md text-label-md shrink-0">
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary pb-1 whitespace-nowrap" data-i18n="nav-how-it-works" href="how-it-works.html">How It Works</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors whitespace-nowrap" data-i18n="nav-assessment" href="../../index.html#assessment">Assessment</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors whitespace-nowrap" data-i18n="nav-examples" href="../../index.html#case-studies">Example Scenarios</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors whitespace-nowrap" data-i18n="nav-ai-doctor" href="../ai-doctor/ai-doctor.html">AI Doctor</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors whitespace-nowrap" data-i18n="nav-history" href="../history/history.html">History</a>
 </div>
-            <div class="flex items-center gap-3">
-                <!-- Language Selector Dropdown -->
-                <div class="flex items-center gap-1.5 bg-surface-container-high/80 px-3 py-1.5 rounded-xl border border-outline-variant/50">
-                    <span class="material-symbols-outlined text-primary text-[20px]">translate</span>
-                    <select id="lang-select" onchange="setLanguage(this.value)" class="bg-transparent text-on-surface font-label-sm text-label-sm focus:outline-none cursor-pointer border-none p-0 pr-1">
-                        <option value="en" class="bg-surface text-on-surface">English 🇬🇧</option>
-                        <option value="hi" class="bg-surface text-on-surface">हिंदी (Hindi) 🇮🇳</option>
-                        <option value="te" class="bg-surface text-on-surface">తెలుగు (Telugu) 🇮🇳</option>
-                        <option value="ta" class="bg-surface text-on-surface">தமிழ் (Tamil) 🇮🇳</option>
-                        <option value="mr" class="bg-surface text-on-surface">मराठी (Marathi) 🇮🇳</option>
-                    </select>
-                </div>
-
-                <!-- Theme Toggle Button (Dark / Light Mode) -->
-                <button onclick="toggleTheme()" title="Toggle Dark / Light Mode" class="p-2 rounded-xl bg-surface-container-high/80 hover:bg-surface-container text-on-surface transition-all flex items-center justify-center border border-outline-variant/50">
-                    <span class="material-symbols-outlined text-[20px] dark:hidden">dark_mode</span>
-                    <span class="material-symbols-outlined text-[20px] hidden dark:block text-yellow-400">light_mode</span>
-                </button>
-
-                <a class="bg-primary-container text-on-primary font-label-md text-label-md px-6 py-2 rounded-lg hover:bg-surface-tint transition-all hover:scale-95 duration-100 ease-in-out flex items-center gap-2" data-i18n="how-it-works-a-33" href="../../index.html#assessment">
-                    <span data-i18n="nav-start-triage">Start Triage</span> <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                </a>
-            </div>
+<div class="flex items-center gap-2 shrink-0">
+<!-- Language Selector Dropdown -->
+<div class="flex items-center gap-1.5 bg-surface-container-high/80 px-2.5 py-1.5 rounded-xl border border-outline-variant/50 max-w-[150px]">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0">translate</span>
+<select class="bg-transparent text-on-surface font-label-sm text-label-sm focus:outline-none cursor-pointer border-none p-0 w-full truncate" id="lang-select" onchange="setLanguage(this.value)">
+<option class="bg-surface text-on-surface" value="en">English 🇬🇧</option>
+<option class="bg-surface text-on-surface" value="hi">हिंदी (Hindi) 🇮🇳</option>
+<option class="bg-surface text-on-surface" value="te">తెలుగు (Telugu) 🇮🇳</option>
+<option class="bg-surface text-on-surface" value="ta">தமிழ் (Tamil) 🇮🇳</option>
+<option class="bg-surface text-on-surface" value="mr">मराठी (Marathi) 🇮🇳</option>
+</select>
+</div>
+<!-- Theme Toggle Button (Dark / Light Mode) -->
+<button class="p-2 rounded-xl bg-surface-container-high/80 hover:bg-surface-container text-on-surface transition-all flex items-center justify-center border border-outline-variant/50 shrink-0" onclick="toggleTheme()" title="Toggle Dark / Light Mode">
+<span class="material-symbols-outlined text-[18px] dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined text-[18px] hidden dark:block text-yellow-400">light_mode</span>
+</button>
+<a class="bg-primary-container text-on-primary font-label-md text-label-md px-4 py-1.5 rounded-lg hover:bg-surface-tint transition-all shrink-0 flex items-center gap-1.5" href="../../index.html#assessment">
+<span data-i18n="nav-start-triage">Start Triage</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
 </div>
 </nav>
 <!-- Header Banner -->
