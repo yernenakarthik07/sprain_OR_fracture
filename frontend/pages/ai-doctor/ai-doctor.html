@@ -26,9 +26,29 @@
                 <a class="text-primary dark:text-primary-fixed border-b-2 border-primary pb-1" data-i18n="nav-ai-doctor" href="ai-doctor.html">AI Doctor</a>
                 <a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" data-i18n="nav-history" href="../history/history.html">History</a>
             </div>
-            <a href="../../index.html#assessment" class="bg-primary-container text-on-primary font-label-md text-label-md px-6 py-2 rounded-lg hover:bg-surface-tint transition-all hover:scale-95 duration-100 ease-in-out flex items-center gap-2">
-                <span data-i18n="nav-start-triage">Start Triage</span> <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-            </a>
+            <div class="flex items-center gap-3">
+                <!-- Language Selector Dropdown -->
+                <div class="flex items-center gap-1.5 bg-surface-container-high/80 px-3 py-1.5 rounded-xl border border-outline-variant/50">
+                    <span class="material-symbols-outlined text-primary text-[20px]">translate</span>
+                    <select id="lang-select" onchange="setLanguage(this.value)" class="bg-transparent text-on-surface font-label-sm text-label-sm focus:outline-none cursor-pointer border-none p-0 pr-1">
+                        <option value="en" class="bg-surface text-on-surface">English 🇬🇧</option>
+                        <option value="hi" class="bg-surface text-on-surface">हिंदी (Hindi) 🇮🇳</option>
+                        <option value="te" class="bg-surface text-on-surface">తెలుగు (Telugu) 🇮🇳</option>
+                        <option value="ta" class="bg-surface text-on-surface">தமிழ் (Tamil) 🇮🇳</option>
+                        <option value="mr" class="bg-surface text-on-surface">मराठी (Marathi) 🇮🇳</option>
+                    </select>
+                </div>
+
+                <!-- Theme Toggle Button (Dark / Light Mode) -->
+                <button onclick="toggleTheme()" title="Toggle Dark / Light Mode" class="p-2 rounded-xl bg-surface-container-high/80 hover:bg-surface-container text-on-surface transition-all flex items-center justify-center border border-outline-variant/50">
+                    <span class="material-symbols-outlined text-[20px] dark:hidden">dark_mode</span>
+                    <span class="material-symbols-outlined text-[20px] hidden dark:block text-yellow-400">light_mode</span>
+                </button>
+
+                <a href="../../index.html#assessment" class="bg-primary-container text-on-primary font-label-md text-label-md px-6 py-2 rounded-lg hover:bg-surface-tint transition-all hover:scale-95 duration-100 ease-in-out flex items-center gap-2">
+                    <span data-i18n="nav-start-triage">Start Triage</span> <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </a>
+            </div>
         </div>
     </nav>
 
