@@ -1,14 +1,14 @@
-// Groq API & Multilingual Speech Assistant Configuration
-// -----------------------------------------------------------
+// Ee code AI doctor chat system, multilingual voice synthesis, mariyu interactive chat responses ni manage chesthundi
+
 const GROQ_API_KEY_LOCAL = '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';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-// State Management for Voice & Assistant
+// App state variables
 let isVoiceOutputEnabled = true;
 let isListening = false;
 let recognition = null;
-let selectedVoiceLang = 'en-US'; // Default
+let selectedVoiceLang = 'en-US';
 
 const langNameMap = {
     'en-US': 'English',
@@ -18,28 +18,25 @@ const langNameMap = {
     'mr-IN': 'Marathi (मराठी)'
 };
 
-// Base system prompt
+// Medical Assistant Prompt Configuration
 const BASE_SYSTEM_PROMPT = `You are Dr. AI, a professional, empathetic medical assistant specializing in injury assessment, fractures, sprains, and general health advice.
 
-IMPORTANT RULES:
+RULES:
 1. ONLY answer questions related to health, medical conditions, injuries, symptoms, and wellness.
-2. If asked about non-medical topics (politics, entertainment, technology, etc.), politely redirect in the requested language.
-3. Always provide accurate, helpful medical information concisely.
+2. If asked about non-medical topics, politely redirect in the requested language.
+3. Provide accurate, helpful medical information concisely.
 4. Use a warm, empathetic, professional tone.
-5. Remind users to seek professional medical care or emergency services for serious conditions.
-6. Never provide specific medication dosages - always advise consulting a qualified doctor.
-7. Keep responses concise, clear, and easy to speak out loud.`;
+5. Remind users to seek professional medical care for serious conditions.
+6. Keep responses concise, clear, and easy to read out loud.`;
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     rotateHealthContent();
     setInterval(rotateHealthContent, 30000);
     initRevealAnimations();
     syncInitialLanguage();
-    initSpeechRecognition();
 });
 
-// Sync initial language selection with global site language or stored preference
+// Selected site language synchronization
 function syncInitialLanguage() {
     const siteLang = window.currentLanguage || localStorage.getItem('selectedLanguage') || 'en';
     const langCodeMap = {
@@ -60,26 +57,20 @@ function syncInitialLanguage() {
     }
 }
 
-// User changed preferred language from dropdown
+// User language dropdown selection change listener
 function onVoiceLangChange(langCode) {
     selectedVoiceLang = langCode;
     stopCurrentSpeech();
-    
-    if (recognition) {
-        recognition.lang = selectedVoiceLang;
-    }
-    
-    const langName = langNameMap[selectedVoiceLang] || selectedVoiceLang;
-    console.log(`[Voice Assistant] Language changed to: ${langName} (${selectedVoiceLang})`);
 }
+window.onVoiceLangChange = onVoiceLangChange;
 
-// Generate system prompt with language instruction
+// Preferred language system prompt generator
 function getSystemPromptForLanguage() {
     const langName = langNameMap[selectedVoiceLang] || 'English';
-    return `${BASE_SYSTEM_PROMPT}\n\nCRITICAL LANGUAGE INSTRUCTION: You MUST write your entire response natively in ${langName}. Do not respond in English unless the requested language is English.`;
+    return `${BASE_SYSTEM_PROMPT}\n\nCRITICAL LANGUAGE INSTRUCTION: You MUST write your entire response natively in ${langName}. Do not respond in English unless requested.`;
 }
 
-// Rotate health quotes and facts
+// Health facts mariyu quotes rotation
 function rotateHealthContent() {
     const healthQuotes = [
         "An apple a day keeps the doctor away! 🍎",
@@ -106,15 +97,16 @@ function rotateHealthContent() {
     if (factEl) factEl.textContent = randomFact;
 }
 
-// Handle enter key press
+// Input field keypress handler
 function handleKeyPress(event) {
     if (event.key === 'Enter') {
         stopCurrentSpeech();
         sendMessage();
     }
 }
+window.handleKeyPress = handleKeyPress;
 
-// Voice Output Toggle (Mute / Unmute Doctor Voice)
+// Spoken voice playback toggle
 function toggleVoiceOutput() {
     isVoiceOutputEnabled = !isVoiceOutputEnabled;
     const btnText = document.getElementById('voice-toggle-text');
@@ -129,23 +121,24 @@ function toggleVoiceOutput() {
         if (btnIcon) btnIcon.textContent = "volume_off";
     }
 }
+window.toggleVoiceOutput = toggleVoiceOutput;
 
-// Stop any ongoing Text-to-Speech playback immediately (No Conflicts)
+// Ongoing Text-to-Speech playback stop function
 function stopCurrentSpeech() {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
     }
 }
+window.stopCurrentSpeech = stopCurrentSpeech;
 
-// Text-to-Speech (TTS) Doctor Voice Output in Preferred Regional Language
+// Doctor voice synthesis in preferred regional language
 function speakDoctorResponse(text) {
     if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
 
     stopCurrentSpeech();
 
-    // Clean text: strip emojis, bullets, and markdown for smooth regional voice reading
     let cleanText = text
-        .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+        .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
         .replace(/[*#_•`]/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
@@ -157,9 +150,8 @@ function speakDoctorResponse(text) {
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
 
-    // Pick regional matching voice if available
     const voices = window.speechSynthesis.getVoices();
-    const targetLangPrefix = selectedVoiceLang.split('-')[0]; // 'hi', 'te', 'ta', 'mr', 'en'
+    const targetLangPrefix = selectedVoiceLang.split('-')[0];
     
     const matchedVoice = voices.find(v => v.lang === selectedVoiceLang || v.lang.startsWith(targetLangPrefix))
         || voices.find(v => v.lang.startsWith('en'));
@@ -171,15 +163,10 @@ function speakDoctorResponse(text) {
     window.speechSynthesis.speak(utterance);
 }
 
-// No microphone listener required — user types their health question.
-function initSpeechRecognition() {}
-function toggleVoiceInput() {}
-function stopListening() {}
-function updateMicUI() {}
-
-// Main Send Message Function
+// User question sending pipeline
 async function sendMessage() {
     const input = document.getElementById('chat-input');
+    if (!input) return;
     const message = input.value.trim();
 
     if (!message) return;
@@ -194,21 +181,21 @@ async function sendMessage() {
     showTypingIndicator();
 
     try {
-        console.log(`Sending message to Groq Llama 3 AI in ${selectedVoiceLang}...`);
         const responseText = await getGroqResponse(message);
         hideTypingIndicator();
         addMessage(responseText, 'ai');
         speakDoctorResponse(responseText);
     } catch (error) {
-        console.error('AI Request Error:', error);
+        console.error('AI Doctor response error:', error);
         hideTypingIndicator();
         const fallback = getSmartFallback(message);
         addMessage(fallback, 'ai');
         speakDoctorResponse(fallback);
     }
 }
+window.sendMessage = sendMessage;
 
-// Call Groq API with Llama 3 model in preferred language
+// Backend / Serverless API request
 async function getGroqResponse(userMessage) {
     const systemPrompt = getSystemPromptForLanguage();
 
@@ -231,7 +218,6 @@ async function getGroqResponse(userMessage) {
         });
 
         if (!response.ok) {
-            // Fallback to proxy route
             const proxyResponse = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -244,17 +230,16 @@ async function getGroqResponse(userMessage) {
             if (proxyData.choices && proxyData.choices[0]?.message?.content) {
                 return proxyData.choices[0].message.content;
             }
-            throw new Error('Groq API request failed.');
+            throw new Error('API request failed');
         }
 
         const data = await response.json();
         if (data.choices && data.choices[0]?.message?.content) {
             return data.choices[0].message.content;
         } else {
-            throw new Error('Invalid response structure from Groq API');
+            throw new Error('Invalid response structure');
         }
     } catch (error) {
-        console.warn('Direct Groq call error, attempting proxy:', error.message);
         const proxyResponse = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -271,7 +256,7 @@ async function getGroqResponse(userMessage) {
     }
 }
 
-// Smart local fallback logic
+// Fallback logic
 function getSmartFallback(message) {
     const lowerMessage = message.toLowerCase();
 
@@ -295,20 +280,19 @@ function getSmartFallback(message) {
     if (lowerMessage.includes('pain')) {
         return "For pain management: Apply ice for acute injuries (first 48h), elevate the limb, rest, and consider over-the-counter pain relievers following proper dosage instructions. Seek medical care if pain persists! 💊";
     }
-    if (lowerMessage.match(/\b(hi|hello|hey|greetings)\b/)) {
-        return "Hello! 👋 I'm Dr. AI. How can I assist you with your health or injury questions today?";
-    }
 
     return "I'm here to help with your health and injury concerns! 🩺 Ask me about fractures vs sprains, R.I.C.E first aid, pain management, or emergency care.";
 }
 
-// Send quick message
+// Quick message template action handler
 async function sendQuickMessage(message) {
-    document.getElementById('chat-input').value = message;
+    const input = document.getElementById('chat-input');
+    if (input) input.value = message;
     await sendMessage();
 }
+window.sendQuickMessage = sendQuickMessage;
 
-// Send sticker
+// Sticker message handler
 async function sendSticker(sticker) {
     stopCurrentSpeech();
     addMessage(sticker, 'user', true);
@@ -326,8 +310,9 @@ async function sendSticker(sticker) {
         speakDoctorResponse(response);
     }
 }
+window.sendSticker = sendSticker;
 
-// Render Message UI
+// Chat bubble rendering function
 function addMessage(text, sender, isSticker = false) {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) return;
@@ -375,6 +360,7 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 
+// Typing animation indicator
 function showTypingIndicator() {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) return;
@@ -401,6 +387,7 @@ function hideTypingIndicator() {
     if (indicator) indicator.remove();
 }
 
+// Chat history reset
 function clearChat() {
     stopCurrentSpeech();
     const chatMessages = document.getElementById('chat-messages');
@@ -414,10 +401,10 @@ function clearChat() {
             <div class="flex-1">
                 <div class="bg-surface-container-high p-4 rounded-2xl rounded-tl-none max-w-md">
                     <p class="font-body-md text-body-md text-on-surface">
-                        Hello! I'm Dr. AI, your virtual health assistant powered by Groq Llama 3 & Whisper. 👋
+                        Hello! I'm Dr. AI, your virtual health assistant. 👋
                     </p>
                     <p class="font-body-md text-body-md text-on-surface mt-2">
-                        You can speak or type your question in your preferred language!
+                        You can type your health question in your preferred language!
                     </p>
                 </div>
                 <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 ml-2">Just now</p>
@@ -427,6 +414,7 @@ function clearChat() {
     const suggestions = document.getElementById('quick-suggestions');
     if (suggestions) suggestions.style.display = 'block';
 }
+window.clearChat = clearChat;
 
 function initRevealAnimations() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

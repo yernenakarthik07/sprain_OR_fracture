@@ -1,21 +1,23 @@
+// Ee code user previous diagnosis history ni Firestore database nundi read chesi page lo table/cards lagana render chesthundi
+
 import { db, auth } from '../../assets/js/firebase-config.js';
 import { collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Global arrays to hold history records for modal popup access and translation switching
+// Global array - full history cards access kosam
 let loadedHistory = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Wait for Firebase auth to initialize
+    // Firebase auth check chesi user ID tho history loading trigger chestham
     auth.onAuthStateChanged((user) => {
         if (user) {
-            document.getElementById('user-email').textContent = user.email;
+            const emailEl = document.getElementById('user-email');
+            if (emailEl) emailEl.textContent = user.email;
             fetchHistory(user.uid);
-        } else {
-            console.log('[History Page] Not authenticated, require-auth.js will redirect.');
         }
     });
 });
 
+// User profile 'history' collection nundi documents load chesthundi
 async function fetchHistory(uid) {
     const loadingEl = document.getElementById('history-loading');
     const emptyEl = document.getElementById('history-empty');
@@ -34,28 +36,32 @@ async function fetchHistory(uid) {
             });
         });
 
-        loadingEl.classList.add('hidden');
+        if (loadingEl) loadingEl.classList.add('hidden');
 
         if (loadedHistory.length === 0) {
-            emptyEl.classList.remove('hidden');
-            listEl.classList.add('hidden');
+            if (emptyEl) emptyEl.classList.remove('hidden');
+            if (listEl) listEl.classList.add('hidden');
         } else {
-            emptyEl.classList.add('hidden');
-            listEl.classList.remove('hidden');
+            if (emptyEl) emptyEl.classList.add('hidden');
+            if (listEl) listEl.classList.remove('hidden');
             renderHistoryList();
         }
     } catch (err) {
-        console.error('Error fetching diagnosis history:', err);
-        loadingEl.innerHTML = `
-            <span class="material-symbols-outlined text-5xl text-error mb-4">error</span>
-            <p class="font-headline-sm text-headline-sm text-error">Failed to load diagnosis history.</p>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">${err.message}</p>
-        `;
+        console.error('Diagnosis history fetching error:', err);
+        if (loadingEl) {
+            loadingEl.innerHTML = `
+                <span class="material-symbols-outlined text-5xl text-error mb-4">error</span>
+                <p class="font-headline-sm text-headline-sm text-error">Failed to load diagnosis history.</p>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">${err.message}</p>
+            `;
+        }
     }
 }
 
+// Loaded records anni screen paina aesthetic HTML cards ga render avuthayi
 function renderHistoryList() {
     const listEl = document.getElementById('history-list');
+    if (!listEl) return;
     listEl.innerHTML = '';
 
     const colorMap = {
@@ -70,12 +76,10 @@ function renderHistoryList() {
         const severity = record.severity || (diagnosis === 'fracture' ? 'High' : (diagnosis === 'sprain' ? 'Medium' : 'Low'));
         const colors = colorMap[diagnosis] || colorMap['normal'];
 
-        // Translations
         const transDiagnosis = window.translateValue('diagnosis-' + diagnosis, diagnosis.charAt(0).toUpperCase() + diagnosis.slice(1));
         const transSeverity = window.translateValue('severity-' + severity.toLowerCase(), severity);
         const typeLabel = record.type === 'xray' ? window.translateValue('xray-header', 'X-Ray Analysis') : window.translateValue('label-ai-diagnosis', 'Symptom Triage');
 
-        // Formatted timestamp
         let formattedDate = '-';
         if (record.timestamp) {
             const dateObj = new Date(record.timestamp);
@@ -118,199 +122,83 @@ function renderHistoryList() {
     });
 }
 
-// Global modal handlers exposed to window
+// Modal view details open chesthunnam
 window.openDetailsModal = function(index) {
     const record = loadedHistory[index];
     if (!record) return;
 
     const modal = document.getElementById('details-modal');
-    const container = document.getElementById('modal-container');
     const diagnosis = record.diagnosis;
     const severity = record.severity || (diagnosis === 'fracture' ? 'High' : (diagnosis === 'sprain' ? 'Medium' : 'Low'));
 
-    // Set colors
     const colorMap = {
-        'fracture': { bg: 'bg-error', icon: 'skeleton', label: 'diagnosis-fracture' },
-        'sprain': { bg: 'bg-warning', icon: 'healing', label: 'diagnosis-sprain' },
-        'normal': { bg: 'bg-success', icon: 'check_circle', label: 'diagnosis-normal' }
+        'fracture': { bg: 'bg-error', icon: 'skeleton' },
+        'sprain': { bg: 'bg-warning', icon: 'healing' },
+        'normal': { bg: 'bg-success', icon: 'check_circle' }
     };
     const colors = colorMap[diagnosis] || colorMap['normal'];
 
     const iconContainer = document.getElementById('modal-icon-container');
-    iconContainer.className = `w-12 h-12 rounded-full flex items-center justify-center text-white ${colors.bg}`;
-    document.getElementById('modal-icon').textContent = record.type === 'xray' ? 'radiology' : colors.icon;
+    if (iconContainer) iconContainer.className = `w-12 h-12 rounded-full flex items-center justify-center text-white ${colors.bg}`;
     
-    // Header labels
-    document.getElementById('modal-type-label').textContent = record.type === 'xray' ? window.translateValue('xray-header', 'X-Ray Analysis') : window.translateValue('label-ai-diagnosis', 'AI Diagnosis');
-    document.getElementById('modal-title-diagnosis').textContent = window.translateValue('diagnosis-' + diagnosis, diagnosis.charAt(0).toUpperCase() + diagnosis.slice(1));
+    const iconEl = document.getElementById('modal-icon');
+    if (iconEl) iconEl.textContent = record.type === 'xray' ? 'radiology' : colors.icon;
+    
+    const typeLabel = document.getElementById('modal-type-label');
+    if (typeLabel) typeLabel.textContent = record.type === 'xray' ? window.translateValue('xray-header', 'X-Ray Analysis') : window.translateValue('label-ai-diagnosis', 'Clinical Assessment');
+    
+    const diagTitle = document.getElementById('modal-title-diagnosis');
+    if (diagTitle) diagTitle.textContent = window.translateValue('diagnosis-' + diagnosis, diagnosis.charAt(0).toUpperCase() + diagnosis.slice(1));
 
-    // Date
     let formattedDate = '-';
     if (record.timestamp) {
         formattedDate = new Date(record.timestamp).toLocaleString();
     }
-    document.getElementById('modal-date').textContent = formattedDate;
+    const dateEl = document.getElementById('modal-date');
+    if (dateEl) dateEl.textContent = formattedDate;
 
-    // Confidence & Severity & Type
-    document.getElementById('modal-confidence').textContent = `${Math.round(record.confidence * 100)}%`;
-    document.getElementById('modal-severity').textContent = window.translateValue('severity-' + severity.toLowerCase(), severity);
-    document.getElementById('modal-type').textContent = record.type === 'xray' ? 'X-Ray Scan' : 'Symptom Triage';
+    const confEl = document.getElementById('modal-confidence');
+    if (confEl) confEl.textContent = `${Math.round(record.confidence * 100)}%`;
+    
+    const sevEl = document.getElementById('modal-severity');
+    if (sevEl) sevEl.textContent = window.translateValue('severity-' + severity.toLowerCase(), severity);
+    
+    const typeEl = document.getElementById('modal-type');
+    if (typeEl) typeEl.textContent = record.type === 'xray' ? 'X-Ray Scan' : 'Symptom Triage';
 
-    // Inputs details
     const inputsEl = document.getElementById('modal-inputs-detail');
-    if (record.type === 'xray') {
-        inputsEl.innerHTML = `
-            <p><strong>${window.translateValue('xray-q-area', 'Area X-Rayed')}:</strong> ${record.inputs?.location || 'Unknown'}</p>
-            <p class="mt-1"><strong>${window.translateValue('hist-type', 'File Name')}:</strong> ${record.inputs?.file_name || 'xray.png'}</p>
-        `;
-    } else {
-        const inputs = record.inputs || {};
-        inputsEl.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <p><strong>${window.translateValue('q-injury-location', 'Injury Location')}:</strong> ${inputs.location || '-'}</p>
-                <p><strong>${window.translateValue('q-pain', 'Pain Level')}:</strong> ${inputs.pain_level || '-'}/10</p>
-                <p><strong>${window.translateValue('q-swelling', 'Swelling')}:</strong> ${inputs.swelling || '-'}</p>
-                <p><strong>${window.translateValue('q-weight', 'Bear Weight')}:</strong> ${inputs.weight_bearing_possible === 'yes' || inputs.weight_bearing_possible === true ? 'Yes' : 'No'}</p>
-                <p><strong>${window.translateValue('q-deformity', 'Visible Deformity')}:</strong> ${inputs.deformity_visible ? 'Yes' : 'No'}</p>
-                <p><strong>${window.translateValue('q-tenderness', 'Press Pain')}:</strong> ${inputs.point_tenderness ? 'Yes' : 'No'}</p>
-            </div>
-        `;
+    if (inputsEl) {
+        if (record.type === 'xray') {
+            inputsEl.innerHTML = `
+                <p><strong>${window.translateValue('xray-q-area', 'Area X-Rayed')}:</strong> ${record.inputs?.location || 'Unknown'}</p>
+                <p class="mt-1"><strong>${window.translateValue('hist-type', 'File Name')}:</strong> ${record.inputs?.file_name || 'xray.png'}</p>
+            `;
+        } else {
+            const inputs = record.inputs || {};
+            inputsEl.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <p><strong>${window.translateValue('q-injury-location', 'Injury Location')}:</strong> ${inputs.location || '-'}</p>
+                    <p><strong>${window.translateValue('q-pain', 'Pain Level')}:</strong> ${inputs.pain_level || '-'}/10</p>
+                    <p><strong>${window.translateValue('q-swelling', 'Swelling')}:</strong> ${inputs.swelling || '-'}</p>
+                    <p><strong>${window.translateValue('q-weight', 'Bear Weight')}:</strong> ${inputs.weight_bearing_possible === 'yes' || inputs.weight_bearing_possible === true ? 'Yes' : 'No'}</p>
+                    <p><strong>${window.translateValue('q-deformity', 'Visible Deformity')}:</strong> ${inputs.deformity_visible ? 'Yes' : 'No'}</p>
+                    <p><strong>${window.translateValue('q-tenderness', 'Press Pain')}:</strong> ${inputs.point_tenderness ? 'Yes' : 'No'}</p>
+                </div>
+            `;
+        }
     }
 
-    // Recommended Actions
     const recActionText = record.type === 'xray'
         ? window.translateMedicalItem('rec', 'xray-' + diagnosis, null, record.recommended_action)
         : window.translateMedicalItem('rec', diagnosis, null, record.recommended_action);
-    document.getElementById('modal-action-text').textContent = recActionText;
-
-    // Medications & Precautions
-    const medContainer = document.getElementById('modal-medications-container');
-    const medText = document.getElementById('modal-medications-text');
-    const transMedications = record.type === 'xray'
-        ? (window.translateMedicalItem('med', 'xray-' + diagnosis, null, record.medications_precautions) || window.translateMedicalItem('med', diagnosis, null, record.medications_precautions))
-        : window.translateMedicalItem('med', diagnosis, null, record.medications_precautions);
     
-    if (transMedications) {
-        medContainer.classList.remove('hidden');
-        medText.textContent = transMedications;
-    } else {
-        medContainer.classList.add('hidden');
-    }
+    const actionEl = document.getElementById('modal-action-text');
+    if (actionEl) actionEl.textContent = recActionText;
 
-    // Diet Recommendation
-    const dietContainer = document.getElementById('modal-diet-container');
-    const eatableList = document.getElementById('modal-diet-eatable-list');
-    const nonEatableList = document.getElementById('modal-diet-non-eatable-list');
-    const eatables = record.diet_eatable || [];
-    const nonEatables = record.diet_non_eatable || [];
-
-    if (eatables.length > 0 || nonEatables.length > 0) {
-        dietContainer.classList.remove('hidden');
-        eatableList.innerHTML = '';
-        nonEatableList.innerHTML = '';
-
-        eatables.forEach((item, idx) => {
-            const transItem = record.type === 'xray'
-                ? (window.translateMedicalItem('eat', 'xray-' + diagnosis, idx, item) || window.translateMedicalItem('eat', diagnosis, idx, item))
-                : window.translateMedicalItem('eat', diagnosis, idx, item);
-            const li = document.createElement('li');
-            li.className = 'flex items-start gap-2 text-primary font-medium';
-            li.innerHTML = `✓ <span>${transItem}</span>`;
-            eatableList.appendChild(li);
-        });
-
-        nonEatables.forEach((item, idx) => {
-            const transItem = record.type === 'xray'
-                ? (window.translateMedicalItem('noeat', 'xray-' + diagnosis, idx, item) || window.translateMedicalItem('noeat', diagnosis, idx, item))
-                : window.translateMedicalItem('noeat', diagnosis, idx, item);
-            const li = document.createElement('li');
-            li.className = 'flex items-start gap-2 text-error font-medium';
-            li.innerHTML = `✗ <span>${transItem}</span>`;
-            nonEatableList.appendChild(li);
-        });
-    } else {
-        dietContainer.classList.add('hidden');
-    }
-
-    // Care Steps list
-    const careStepsContainer = document.getElementById('modal-care-steps-container');
-    const careStepsList = document.getElementById('modal-care-steps-list');
-    const careSteps = record.care_steps || [];
-    if (careSteps.length > 0) {
-        careStepsContainer.classList.remove('hidden');
-        careStepsList.innerHTML = '';
-        careSteps.forEach((step, idx) => {
-            const transStep = record.type === 'xray'
-                ? (window.translateMedicalItem('care', 'xray-' + diagnosis, idx, step) || window.translateMedicalItem('care', diagnosis, idx, step))
-                : window.translateMedicalItem('care', diagnosis, idx, step);
-            const li = document.createElement('li');
-            li.textContent = transStep;
-            careStepsList.appendChild(li);
-        });
-    } else {
-        careStepsContainer.classList.add('hidden');
-    }
-
-    // Red Flags list
-    const flagsContainer = document.getElementById('modal-red-flags-container');
-    const flagsList = document.getElementById('modal-red-flags-list');
-    const helpSteps = record.when_to_seek_help || [];
-    if (helpSteps.length > 0) {
-        flagsContainer.classList.remove('hidden');
-        flagsList.innerHTML = '';
-        helpSteps.forEach((step, idx) => {
-            const transStep = record.type === 'xray'
-                ? (window.translateMedicalItem('help', 'xray-' + diagnosis, idx, step) || window.translateMedicalItem('help', diagnosis, idx, step))
-                : window.translateMedicalItem('help', diagnosis, idx, step);
-            const li = document.createElement('li');
-            li.textContent = transStep;
-            flagsList.appendChild(li);
-        });
-    } else {
-        flagsContainer.classList.add('hidden');
-    }
-
-    // Differentials
-    const diffContainer = document.getElementById('modal-differentials-container');
-    const diffList = document.getElementById('modal-differentials-list');
-    const diffs = record.differential || [];
-    if (diffs.length > 0) {
-        diffContainer.classList.remove('hidden');
-        diffList.innerHTML = '';
-        diffs.forEach((diff, idx) => {
-            const transDiff = record.type === 'xray'
-                ? (window.translateMedicalItem('diff', 'xray-' + diagnosis, idx, diff) || window.translateMedicalItem('diff', diagnosis, idx, diff))
-                : window.translateMedicalItem('diff', diagnosis, idx, diff);
-            const badge = document.createElement('span');
-            badge.className = 'inline-block bg-surface-container px-3 py-1 rounded-full text-on-surface-variant font-body-sm text-body-sm';
-            badge.textContent = transDiff;
-            diffList.appendChild(badge);
-        });
-    } else {
-        diffContainer.classList.add('hidden');
-    }
-
-    // Open Modal animation
-    modal.classList.remove('pointer-events-none');
-    modal.classList.add('opacity-100');
-    container.classList.remove('scale-95');
-    container.classList.add('scale-100');
+    if (modal) modal.classList.remove('hidden');
 };
 
 window.closeDetailsModal = function() {
     const modal = document.getElementById('details-modal');
-    const container = document.getElementById('modal-container');
-
-    modal.classList.add('pointer-events-none');
-    modal.classList.remove('opacity-100');
-    container.classList.add('scale-95');
-    container.classList.remove('scale-100');
+    if (modal) modal.classList.add('hidden');
 };
-
-// Listen to languageChanged to reload translations dynamically in-place
-window.addEventListener('languageChanged', () => {
-    console.log('[History Page] Live-reloading translations on language select');
-    if (loadedHistory.length > 0) {
-        renderHistoryList();
-    }
-});

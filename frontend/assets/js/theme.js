@@ -1,23 +1,30 @@
-// Global Theme Manager (Dark / Light Mode)
+// Ee script website lo Light Mode mariyu Dark Mode theme toggle ni manage chesthundi
+
 (function() {
-    window.initTheme = function() {
-        const savedTheme = localStorage.getItem('theme');
-        const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    };
+    // LocalStorage nundi user theme preference check chesthunnam (default: dark mode)
+    const storedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Default dark theme setting
+    const activeTheme = storedTheme || (systemPrefersDark ? 'dark' : 'dark');
 
-    window.toggleTheme = function() {
-        const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        const icon = document.getElementById('global-theme-icon');
-        if (icon) {
-            icon.textContent = isDark ? 'light_mode' : 'dark_mode';
-        }
-    };
-
-    window.initTheme();
+    if (activeTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
 })();
+
+// User theme switch button press chesinappudu Run avuthundi
+function toggleTheme() {
+    const isDark = document.documentElement.classList.contains('dark');
+    if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+window.toggleTheme = toggleTheme;

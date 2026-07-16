@@ -1,7 +1,4 @@
-"""
-app.py  –  FractureOrSprain? Flask REST API
-Run:  python app.py
-"""
+# Ee Flask backend API server symptom assessment triage mariyu X-Ray ONNX CNN model inference endpoints process chesthundi
 
 import sys
 import os

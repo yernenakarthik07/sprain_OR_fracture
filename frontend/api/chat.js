@@ -1,51 +1,45 @@
-/**
- * Vercel Serverless Function — Groq / Gemini AI Chat & Voice Proxy
- * Primary model: Groq Llama-3.3-70b-versatile & Whisper
- */
+// Ee serverless proxy function Doctor health assistant chat requests ni process chesthundi
 
-const GROQ_API_KEY_DEFAULT = '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';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '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';
+const MODEL_NAME = 'llama-3.3-70b-versatile';
 
-async function handler(req, res) {
-    try {
-        if (req.method !== 'POST') {
-            return res.status(405).json({ error: 'Method not allowed' });
-        }
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-        const apiKey = process.env.GROQ_API_KEY || GROQ_API_KEY_DEFAULT;
-        
-        const systemPrompt = req.body.system_prompt || "You are Dr. AI, an expert medical triage assistant.";
-        const userMessage = req.body.message || (req.body.contents ? req.body.contents[0]?.parts[0]?.text : "");
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-        const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-        const upstream = await fetch(GROQ_URL, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: GROQ_MODEL,
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: userMessage }
-                ],
-                temperature: 0.5,
-                max_tokens: 1024
-            }),
-        });
+  try {
+    const { system_prompt, message } = req.body;
 
-        const data = await upstream.json();
-        return res.status(upstream.status).json(data);
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: MODEL_NAME,
+        messages: [
+          { role: 'system', content: system_prompt || 'You are an empathetic medical assistant.' },
+          { role: 'user', content: message }
+        ],
+        temperature: 0.5,
+        max_tokens: 1024
+      })
+    });
 
-    } catch (err) {
-        console.error('[Groq Chat Proxy Error]', err);
-        return res.status(500).json({
-            error: 'Proxy function error',
-            message: err.message,
-        });
-    }
+    const data = await response.json();
+    return res.status(response.status).json(data);
+  } catch (error) {
+    console.error('Chat Proxy Error:', error);
+    return res.status(500).json({ error: 'Failed to process chat request' });
+  }
 }
-
-module.exports = handler;
