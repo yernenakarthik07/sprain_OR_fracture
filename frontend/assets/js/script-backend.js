@@ -547,26 +547,7 @@ function displayResult(result) {
     `;
 
     if (resultContent) {
-        resultContent.innerHTML = `
-            <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/30">
-                <div class="flex items-center justify-center gap-3 mb-4">
-                    <span class="material-symbols-outlined text-4xl text-${colors.text}" style="font-variation-settings: 'FILL' 1;">${colors.icon}</span>
-                    <div>
-                        <p class="font-label-sm text-label-sm text-on-surface-variant uppercase">${labelAiDiagnosis}</p>
-                        <p class="font-headline-md text-headline-md text-on-surface">${transDiagnosis}</p>
-                    </div>
-                </div>
-                <div class="bg-surface-container text-on-surface px-3 py-2 rounded-lg font-label-md text-label-md text-center mb-4">
-                    ${labelConfidence}: ${confidence}%
-                </div>
-                <div class="bg-primary/10 px-3 py-2 rounded-lg text-center mb-4">
-                    <p class="font-label-sm text-label-sm text-primary">${labelPoweredBy}</p>
-                </div>
-                <p class="font-body-md text-body-md text-on-surface-variant text-center mb-4">
-                    ${labelScrollDown}
-                </p>
-            </div>
-        `;
+        resultContent.innerHTML = resultHTML;
     }
 
     if (floatingCard) {
