@@ -1,9 +1,5 @@
 // Ee code AI doctor chat system, multilingual voice synthesis, mariyu interactive chat responses ni manage chesthundi
 
-const GROQ_API_KEY_LOCAL = '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';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-
 // App state variables
 let isVoiceOutputEnabled = true;
 let isListening = false;
@@ -199,61 +195,19 @@ window.sendMessage = sendMessage;
 async function getGroqResponse(userMessage) {
     const systemPrompt = getSystemPromptForLanguage();
 
-    try {
-        const response = await fetch(GROQ_API_URL, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${GROQ_API_KEY_LOCAL}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: GROQ_MODEL,
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: userMessage }
-                ],
-                temperature: 0.5,
-                max_tokens: 1024
-            })
-        });
-
-        if (!response.ok) {
-            const proxyResponse = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    system_prompt: systemPrompt,
-                    message: userMessage
-                })
-            });
-            const proxyData = await proxyResponse.json();
-            if (proxyData.choices && proxyData.choices[0]?.message?.content) {
-                return proxyData.choices[0].message.content;
-            }
-            throw new Error('API request failed');
-        }
-
-        const data = await response.json();
-        if (data.choices && data.choices[0]?.message?.content) {
-            return data.choices[0].message.content;
-        } else {
-            throw new Error('Invalid response structure');
-        }
-    } catch (error) {
-        const proxyResponse = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                system_prompt: systemPrompt,
-                message: userMessage
-            })
-        });
-        const proxyData = await proxyResponse.json();
-        if (proxyData.choices && proxyData.choices[0]?.message?.content) {
-            return proxyData.choices[0].message.content;
-        }
-        throw error;
+    const proxyResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            system_prompt: systemPrompt,
+            message: userMessage
+        })
+    });
+    const proxyData = await proxyResponse.json();
+    if (proxyData.choices && proxyData.choices[0]?.message?.content) {
+        return proxyData.choices[0].message.content;
     }
+    throw new Error('API request failed');
 }
 
 // Fallback logic
